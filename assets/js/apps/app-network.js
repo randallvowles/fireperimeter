@@ -7,7 +7,7 @@
     var apiArgs = M.windowArgs();
 
     // Force a set of variables
-    var rankedSensors = ["air_temp", "wind_speed", "wind_direction", "relative_humidity"]
+    var rankedSensors = ["air_temp", "relative_humidity", "wind_speed", "wind_direction"]
     apiArgs.vars = rankedSensors.join(",");
     apiArgs.units = "english";
 
@@ -17,7 +17,17 @@
         table_class: "",
         sensors: rankedSensors
     };
+    // d3.json("http://home.chpc.utah.edu/~u0540701/fireserver/sample_fire2.json", function(data){
+    var stidStack = [];
+    var key;
+    for (key in sample_fire.nearest_stations){
+        stidStack.push(sample_fire.nearest_stations[key]["STID"]);
+    };
 
+    console.log(stidStack);
+    var stidList = stidStack.join(",");
+    console.log(stidList);
+    apiArgs.stid = stidList;
     M.fetch({ api_args: apiArgs });
 
     M.printResponse();
@@ -49,7 +59,7 @@
         while (i < l) {
             // We need to find the last element in the array, since that should be the most
             // current for the text range. Then we populate it with key/value pairs that 
-            // contain the most recent value for the time period requested.  As we go, we will
+            // contain the most recent value for the time period requested. As we go, we will
             // always be looking for null values and handling them.
             if (typeof _s[i].OBSERVATIONS.date_time === "undefined") { i++; break; }
             
