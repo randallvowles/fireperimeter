@@ -114,5 +114,6 @@
             })
             .enter().append("td")
             .text(function (d) { return d.value })
+            .attr("class", function(d) {return d.name;})
     }
 })();
