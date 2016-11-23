@@ -35,10 +35,26 @@
         api_args: apiArgs
     });
     var filter = JSON.parse(M.windowArgs().select)
+    console.log(filter);
     M.printResponse();
     $.when(M.async()).done(function () {
-        _networkTableEmitter(M, tableArgs),
+        _networkTableEmitter(M, tableArgs);
         _highlightCells(filter);
+        //     _highlightCells({
+        //     "selector": ".air_temp",
+        //     "min": 40,
+        //     "max": 60
+        // }),
+        //     _highlightCells({
+        //     "selector": ".relative_humidity",
+        //     "min": 20,
+        //     "max": 50
+        // }),
+        // _highlightCells({
+        //     "selector": ".wind_speed",
+        //     "min": 10,
+        //     "max": undefined
+        // })
     });
 
 
@@ -137,31 +153,38 @@
     function _highlightCells({
         "selector": selector,
         "min": A,
+
         "max": B
     }) {
+        //     var selector;
+        //     var A;
+        //     var B;
+        //     object_selector = {
+        //     "selector": selector,
+        //     "min": A,
+
+        //     "max": B
+        // } 
         if (typeof selector == undefined) {
             return false;
         };
         if (typeof A !== undefined && typeof B !== undefined) {
-            // range code
+            // range code, given a min and a max
             d3.selectAll(selector).classed("bang", function () {
                 return Number(d3.select(this).text()) > A &&
                     Number(d3.select(this).text()) < B ? true : false;
             });
-        }
-        else if (typeof A !== undefined && typeof B == undefined) {
-            // less-than code
+        } else if (typeof A !== undefined && typeof B == undefined) {
+            // greater-than code, min but no max
             d3.selectAll(selector).classed("bang", function () {
                 return Number(d3.select(this).text()) < A ? true : false;
             });
-        }
-        else if (typeof A == undefined && typeof B !== undefined) {
-            // greater-than code
+        } else if (typeof A == undefined && typeof B !== undefined) {
+            // less-than code, max but no min
             d3.selectAll(selector).classed("bang", function () {
                 return Number(d3.select(this).text()) > B ? true : false;
             });
-        }
-        else {
+        } else {
             return false;
         };
     };
