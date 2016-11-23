@@ -3,7 +3,10 @@
 
     var APITOKEN = "demotoken"
 
-    var M = new Mesonet({ token: APITOKEN, service: "TimeSeries" });
+    var M = new Mesonet({
+        token: APITOKEN,
+        service: "TimeSeries"
+    });
     var apiArgs = M.windowArgs();
 
     // Force a set of variables
@@ -20,7 +23,7 @@
     // d3.json("http://home.chpc.utah.edu/~u0540701/fireserver/sample_fire2.json", function(data){
     var stidStack = [];
     var key;
-    for (key in sample_fire.nearest_stations){
+    for (key in sample_fire.nearest_stations) {
         stidStack.push(sample_fire.nearest_stations[key]["STID"]);
     };
 
@@ -28,12 +31,16 @@
     var stidList = stidStack.join(",");
     console.log(stidList);
     apiArgs.stid = stidList;
-    M.fetch({ api_args: apiArgs });
-
+    M.fetch({
+        api_args: apiArgs
+    });
+    filter = JSON.parse(M.windowArgs().select)
     M.printResponse();
     $.when(M.async()).done(function () {
         _networkTableEmitter(M, tableArgs);
+        _highlightCells(filter);
     });
+
 
     return
 
@@ -61,8 +68,11 @@
             // current for the text range. Then we populate it with key/value pairs that 
             // contain the most recent value for the time period requested. As we go, we will
             // always be looking for null values and handling them.
-            if (typeof _s[i].OBSERVATIONS.date_time === "undefined") { i++; break; }
-            
+            if (typeof _s[i].OBSERVATIONS.date_time === "undefined") {
+                i++;
+                break;
+            }
+
             var last = _s[i].OBSERVATIONS.date_time.length - 1
             var tmp = {};
             tmp.stid = _s[i].STID
@@ -71,26 +81,25 @@
                 // Best to use terinary logic here, but for simplicity...
                 if (typeof _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"] === "undefined") {
                     tmp[d] = null;
-                }
-                else {
+                } else {
                     tmp[d] = _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last]
-                }    
+                }
             })
 
             // Append to our new `stations` array            
             stations.push(tmp);
-            
+
             i++;
         }
 
-        console.log("Sorted stations with most recent ob");        
+        console.log("Sorted stations with most recent ob");
         console.log(stations);
 
         // Create and append table to DOM, but first check to see if we have a table node.
         d3.select("body " + args.table_container).selectAll("table").remove();
         var table = d3.select("body " + args.table_container).append("table")
             .attr("id", args.table_id)
-        
+
         // Make the header
         table.append("thead").attr("class", "fixed-header").append("tr")
             .selectAll("th").data(["stid"].concat(rankedSensors)).enter().append("th")
@@ -113,7 +122,47 @@
                 });
             })
             .enter().append("td")
-            .text(function (d) { return d.value })
-            .attr("class", function(d) {return d.name;})
+            .text(function (d) {
+                return d.value
+            })
+            .attr("class", function (d) {
+                return d.name;
+            })
     }
+
+    /**
+     * Highlights Cells based on user-defined parameters
+     * @param {object} Selector, Min, Max
+     */
+    function _highlightCells({
+        "selector": selector,
+        "min": A,
+        "max": B
+    }) {
+        if (typeof selector == undefined) {
+            return false;
+        };
+        if (typeof A !== undefined && typeof B !== undefined) {
+            // range code
+            d3.selectAll(selector).classed("bang", function () {
+                return Number(d3.select(this).text()) > A &&
+                    Number(d3.select(this).text()) < B ? true : false;
+            });
+        }
+        else if (typeof A !== undefined && typeof B == undefined) {
+            // less-than code
+            d3.selectAll(selector).classed("bang", function () {
+                return Number(d3.select(this).text()) < A ? true : false;
+            });
+        }
+        else if (typeof A == undefined && typeof B !== undefined) {
+            // greater-than code
+            d3.selectAll(selector).classed("bang", function () {
+                return Number(d3.select(this).text()) > B ? true : false;
+            });
+        }
+        else {
+            return false;
+        };
+    };
 })();
