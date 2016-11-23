@@ -36,6 +36,8 @@
     });
     var filter = JSON.parse(M.windowArgs().select)
     console.log(filter);
+    console.log(Object.keys(filter).length);
+
     M.printResponse();
     $.when(M.async()).done(function () {
         _networkTableEmitter(M, tableArgs);
@@ -150,42 +152,41 @@
      * Highlights Cells based on user-defined parameters
      * @param {object} Selector, Min, Max
      */
-    function _highlightCells({
-        "selector": selector,
-        "min": A,
-
-        "max": B
-    }) {
-        //     var selector;
-        //     var A;
-        //     var B;
-        //     object_selector = {
-        //     "selector": selector,
-        //     "min": A,
-
-        //     "max": B
-        // } 
-        if (typeof selector == undefined) {
-            return false;
-        };
-        if (typeof A !== undefined && typeof B !== undefined) {
-            // range code, given a min and a max
-            d3.selectAll(selector).classed("bang", function () {
-                return Number(d3.select(this).text()) > A &&
-                    Number(d3.select(this).text()) < B ? true : false;
-            });
-        } else if (typeof A !== undefined && typeof B == undefined) {
-            // greater-than code, min but no max
-            d3.selectAll(selector).classed("bang", function () {
-                return Number(d3.select(this).text()) > A ? true : false;
-            });
-        } else if (typeof A == undefined && typeof B !== undefined) {
-            // less-than code, max but no min
-            d3.selectAll(selector).classed("bang", function () {
-                return Number(d3.select(this).text()) < B ? true : false;
-            });
-        } else {
-            return false;
+    function _highlightCells(object) {
+        //     object in the form:
+        //     {selector: {"min": A, max": B}}
+        var i = 0;
+        var li = Object.keys(filter).length
+        while (i < li) {
+            var selector = (Object.keys(filter))[i];
+            console.log(selector);
+            var A = filter[selector].min;
+            var B = filter[selector].max;
+            console.log(A)
+            console.log(B);
+            if (typeof selector === "undefined") {
+                return false;
+            };
+            if (typeof A !== "undefined" && typeof B !== "undefined") {
+                // range code, given a min and a max
+                d3.selectAll(selector).classed("bang", function () {
+                    return Number(d3.select(this).text()) > A &&
+                        Number(d3.select(this).text()) < B ? true : false;
+                });
+            } else if (typeof A !== "undefined" && typeof B === "undefined") {
+                // greater-than code, min but no max
+                d3.selectAll(selector).classed("bang", function () {
+                    return Number(d3.select(this).text()) > A ? true : false;
+                });
+            } else if (typeof A === "undefined" && typeof B !== "undefined") {
+                // less-than code, max but no min
+                d3.selectAll(selector).classed("bang", function () {
+                    return Number(d3.select(this).text()) < B ? true : false;
+                });
+            } else {
+                return false;
+            };
+            i++;
         };
     };
 })();
