@@ -34,7 +34,7 @@
     M.fetch({
         api_args: apiArgs
     });
-    filter = JSON.parse(M.windowArgs().select)
+    var filter = JSON.parse(M.windowArgs().select)
     M.printResponse();
     $.when(M.async()).done(function () {
         _networkTableEmitter(M, tableArgs);
