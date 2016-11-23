@@ -177,12 +177,12 @@
         } else if (typeof A !== undefined && typeof B == undefined) {
             // greater-than code, min but no max
             d3.selectAll(selector).classed("bang", function () {
-                return Number(d3.select(this).text()) < A ? true : false;
+                return Number(d3.select(this).text()) > A ? true : false;
             });
         } else if (typeof A == undefined && typeof B !== undefined) {
             // less-than code, max but no min
             d3.selectAll(selector).classed("bang", function () {
-                return Number(d3.select(this).text()) > B ? true : false;
+                return Number(d3.select(this).text()) < B ? true : false;
             });
         } else {
             return false;
