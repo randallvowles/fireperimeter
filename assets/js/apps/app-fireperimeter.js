@@ -37,7 +37,7 @@
     var filter = JSON.parse(M.windowArgs().select)
     M.printResponse();
     $.when(M.async()).done(function () {
-        _networkTableEmitter(M, tableArgs);
+        _networkTableEmitter(M, tableArgs),
         _highlightCells(filter);
     });
 
