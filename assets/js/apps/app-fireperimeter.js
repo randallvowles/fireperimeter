@@ -27,9 +27,9 @@
         stidStack.push(sample_fire.nearest_stations[key]["STID"]);
     };
 
-    console.log(stidStack);
+    // console.log(stidStack);
     var stidList = stidStack.join(",");
-    console.log(stidList);
+    // console.log(stidList);
     apiArgs.stid = stidList;
     M.fetch({
         api_args: apiArgs
