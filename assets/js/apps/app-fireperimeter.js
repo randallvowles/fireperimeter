@@ -144,7 +144,7 @@
                 return d.value
             })
             .attr("class", function (d) {
-                return d.name;
+                return (d.name)
             })
     }
 

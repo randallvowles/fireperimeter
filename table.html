@@ -15,6 +15,7 @@
             border-collapse: collapse;
             border: 1px solid black;
         }
+        
         .bang {
             background: red;
         }
@@ -22,9 +23,29 @@
 </head>
 
 <body>
+    <form>
+        <div id="input_form" <form action="getForm.php" method="get">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Variables
+                        <span class="caret"></span></button></br>
+            <!--<label>Variable: <input type="text" id="variable"></label><br>-->
+            <label>Min: <input type="text" id="minValue"></label><br>
+            <label>Max: <input type="text" id="maxValue"></label><br>
+
+            <input type="button" value="Apply" id="applyRule">
+    </form>
+    </div>
     <div id="nettable-container"></div>
 </body>
-
+<script type="text/javascript">
+    $(document).ready(function){
+        var variable = document.getElementById('variable').value;
+        var minValue = document.getElementById('minValue').value;
+        var maxValue = document.getElementById('maxValue').value;
+        applyRule.click(function(){
+            alert(minValue);
+        });
+    };
+</script>
 <script src="assets/js/core/mesonet-current.min.js"></script>
 <script src="assets/js/core/sample_fire.js"></script>
 <script src="http://dev2.mesowest.net/tomato//assets/js/core/d3.v4.js"></script>
