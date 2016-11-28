@@ -25,12 +25,16 @@
 <body>
     <form>
         <div id="input_form" <form action="getForm.php" method="get">
-            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Variables
-                        <span class="caret"></span></button></br>
+            <select id="variable">
+                <option>Air Temperature</option>
+                <option>Relative Humidity</option>
+                <option>Wind Speed</option>
+            </select>
+            <!--<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Variables
+                        <span class="caret"></span></button></br>-->
             <!--<label>Variable: <input type="text" id="variable"></label><br>-->
-            <label>Min: <input type="text" id="minValue"></label><br>
-            <label>Max: <input type="text" id="maxValue"></label><br>
-
+            <label>Min: <input type="text" id="minValue"></label>
+            <label>Max: <input type="text" id="maxValue"></label>
             <input type="button" value="Apply" id="applyRule">
     </form>
     </div>
@@ -38,11 +42,12 @@
 </body>
 <script type="text/javascript">
     $(document).ready(function){
-        var variable = document.getElementById('variable').value;
-        var minValue = document.getElementById('minValue').value;
-        var maxValue = document.getElementById('maxValue').value;
+        var variable = document.getElementById('variable');
+        var minValue = document.getElementById('minValue');
+        var maxValue = document.getElementById('maxValue');
         applyRule.click(function(){
-            alert(minValue);
+            console.log(minValue);
+            
         });
     };
 </script>
