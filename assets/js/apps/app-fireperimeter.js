@@ -178,7 +178,6 @@
                 });
             // } else if (typeof A !== "undefined" || A !== null && typeof B === "undefined" || B === null) {
             } else if (typeof A !== "undefined" && typeof B === "undefined") {
-                console.log("Here I am! I'm working!");
                 // greater-than code, min but no max
                 d3.selectAll("." + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) > A ? true : false;

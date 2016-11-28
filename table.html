@@ -23,7 +23,8 @@
 </head>
 
 <body>
-    <form onload="onload();">
+    <form>
+        <!--onload="onload();"-->
         <div id="input_form">
             <!--form action="getForm.php" method="get">-->
             <!--<select id="variable">
@@ -46,17 +47,16 @@
             <label>Wind Direction - </label>
             <label>Min: <input type="text" id="minValueWD" value="null"></label>
             <label>Max: <input type="text" id="maxValueWD" value="null"></label></br>
-            <input type="button" value="Apply" id="applyRule"></br>
+            <input type="button" value="Apply" onclick=_applyRule()></br>
             <!--<p id= "new_url">
                 document.getElementById("new_url").text = url_string
                 </p>-->
         </div>
     </form>
     <div id="nettable-container"></div>
-</body>
-<script type="text/javascript">
-    function onload(){
-        // var variable = document.getElementById('variable');
+    <!--</body>-->
+    <script type="text/javascript">
+    _applyRule = function(string){
         var minValueAT = document.getElementById('minValueAT').value;
         var maxValueAT = document.getElementById('maxValueAT').value;
         var minValueRH = document.getElementById('minValueRH').value;
@@ -65,14 +65,21 @@
         var maxValueWS = document.getElementById('maxValueWS').value;
         var minValueWD = document.getElementById('minValueWD').value;
         var maxValueWD = document.getElementById('maxValueWD').value;
-        applyRule.click(function(){
-
-        });
-
-
+        var current_url = window.location.href
+        console.log(current_url);
+        var base_url = current_url.replace(/(&select=)\S+(\}\})/, "");
+        var new_url = (base_url + "&select={\"air_temp\":{\"min\":"+minValueAT+
+                    ",\"max\":"+maxValueAT+"},\"relative_humidity\":{\"min\":"+
+                    minValueRH+",\"max\":"+maxValueRH+"},\"wind_speed\":{\"min\":"+
+                    minValueWS+",\"max\":"+maxValueWS+"},\"wind_direction\":{\"min\":"+minValueWD+",\"max\":"+maxValueWD+"}}");
+        window.location.href = new_url;
         };
 
+
+
+
 </script>
+</body>
 <script src="assets/js/core/mesonet-current.min.js"></script>
 <script src="assets/js/core/sample_fire.js"></script>
 <script src="http://dev2.mesowest.net/tomato//assets/js/core/d3.v4.js"></script>
