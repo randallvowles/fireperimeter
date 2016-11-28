@@ -159,28 +159,34 @@
         var li = Object.keys(filter).length
         while (i < li) {
             var selector = (Object.keys(filter))[i];
-            console.log(selector);
-            var A = filter[selector].min;
-            var B = filter[selector].max;
-            console.log(A)
-            console.log(B);
+            console.log("Variable selected = "+selector);
+            // assign min/max values, test for null
+            var A = filter[selector].min === "null" ? undefined : filter[selector].min;
+            var B = filter[selector].max === "null" ? undefined : filter[selector].max;
+            console.log("Min = "+A)
+            console.log("Max = "+B);
             if (typeof selector === "undefined") {
                 return false;
             };
-            if (typeof A !== "undefined" && typeof B !== "undefined") {
+            // if (typeof A !== "undefined" || A !== null && typeof B !== "undefined" || B !== null) {
+                if (typeof A !== "undefined" && typeof B !== "undefined") {
+
                 // range code, given a min and a max
-                d3.selectAll(selector).classed("bang", function () {
+                d3.selectAll("." + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) > A &&
                         Number(d3.select(this).text()) < B ? true : false;
                 });
+            // } else if (typeof A !== "undefined" || A !== null && typeof B === "undefined" || B === null) {
             } else if (typeof A !== "undefined" && typeof B === "undefined") {
+                console.log("Here I am! I'm working!");
                 // greater-than code, min but no max
-                d3.selectAll(selector).classed("bang", function () {
+                d3.selectAll("." + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) > A ? true : false;
                 });
+            // } else if (typeof A === "undefined" || A === null && typeof B !== "undefined" || B !== null) {
             } else if (typeof A === "undefined" && typeof B !== "undefined") {
                 // less-than code, max but no min
-                d3.selectAll(selector).classed("bang", function () {
+                d3.selectAll("." + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) < B ? true : false;
                 });
             } else {
