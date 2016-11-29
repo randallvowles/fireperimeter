@@ -157,41 +157,45 @@
         //     {selector: {"min": A, max": B}}
         var i = 0;
         var li = Object.keys(filter).length
-        while (i < li) {
-            var selector = (Object.keys(filter))[i];
-            console.log("Variable selected = "+selector);
+        var key;
+        // while (i < li) {
+        for (key in Object.keys(filter)) {
+            var selector = (Object.keys(filter))[key];
+            console.log("Variable selected = " + selector);
             // assign min/max values, test for null
-            var A = filter[selector].min === "null" ? undefined : filter[selector].min;
-            var B = filter[selector].max === "null" ? undefined : filter[selector].max;
-            console.log("Min = "+A)
-            console.log("Max = "+B);
+            var A = typeof filter[selector].min === "undefined" ? null : filter[selector].min;
+            var B = typeof filter[selector].max === "undefined" ? null : filter[selector].max;
+            console.log("Min = " + A)
+            console.log("Max = " + B);
             if (typeof selector === "undefined") {
                 return false;
             };
             // if (typeof A !== "undefined" || A !== null && typeof B !== "undefined" || B !== null) {
-                if (typeof A !== "undefined" && typeof B !== "undefined") {
-
+            if (A !== null && B !== null) {
                 // range code, given a min and a max
                 d3.selectAll("." + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) > A &&
                         Number(d3.select(this).text()) < B ? true : false;
                 });
-            // } else if (typeof A !== "undefined" || A !== null && typeof B === "undefined" || B === null) {
-            } else if (typeof A !== "undefined" && typeof B === "undefined") {
+                // } else if (typeof A !== "undefined" || A !== null && typeof B === "undefined" || B === null) {
+            } else if (A !== null && B === null) {
                 // greater-than code, min but no max
                 d3.selectAll("." + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) > A ? true : false;
                 });
-            // } else if (typeof A === "undefined" || A === null && typeof B !== "undefined" || B !== null) {
-            } else if (typeof A === "undefined" && typeof B !== "undefined") {
+                // } else if (typeof A === "undefined" || A === null && typeof B !== "undefined" || B !== null) {
+            } else if (A === null && B !== null) {
                 // less-than code, max but no min
                 d3.selectAll("." + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) < B ? true : false;
                 });
+            } else if (A === null && B === null) {
+                // return false;
+                continue;
             } else {
-                return false;
+                console.log("Bang! Bang! Something went terribly wrong!!!!!")
             };
-            i++;
+            // i++;
         };
     };
 })();
