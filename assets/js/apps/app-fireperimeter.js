@@ -38,8 +38,8 @@
         api_args: apiArgs
     });
     var filter = JSON.parse(M.windowArgs().select)
-    // console.log(filter);
-    // console.log(Object.keys(filter).length);
+        // console.log(filter);
+        // console.log(Object.keys(filter).length);
 
     M.printResponse();
     $.when(M.async()).done(function () {
@@ -65,10 +65,10 @@
         // we generate the table correctly.  We also want an array to put our sorted keys
         // back in to.  Once the sensors are ranked, we will create a sorted output that
         // will be ready to generate a table from.
-        rankedSensors.splice(0,0, "dfp")
-        
-        rankedSensors.splice(1,0, "bfp")
-        rankedSensors.splice(2,0, "date_time")
+        rankedSensors.splice(0, 0, "dfp")
+
+        rankedSensors.splice(1, 0, "bfp")
+        rankedSensors.splice(2, 0, "date_time")
         var stations = [];
         var i = 0;
         var l = _s.length;
@@ -90,13 +90,14 @@
                 // console.log(d)
                 // console.log(stidAndDist[i][0])
                 // Best to use terinary logic here, but for simplicity...
-                if (d === "bfp" || d === "dfp") {
+                if (d === "dfp") {
                     tmp[d] = (stidAndDist[i][0]).toFixed(2);
-                    tmp[d] = (stidAndDist[i][1]).toFixed(2);
-                    
+
+                } else if (d === "bfp") {
+                    tmp[d] = (stidAndDist[i][1]).toFixed(0);
                 } else if (typeof _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"] === "undefined") {
                     tmp[d] = null;
-                
+
 
                 } else {
                     tmp[d] = _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last]
@@ -123,7 +124,9 @@
             .html(function (d) {
                 return d;
             })
-            .attr("id", function (d) { return d; })
+            .attr("id", function (d) {
+                return d;
+            })
             .classed("table-header", true)
             .property("sorted", false)
             .on('click', function (d) {
@@ -131,28 +134,35 @@
                 var _thisId = d3.select(this).attr("id");
                 var _this = this;
                 var _state = d3.select(this).property("sorted");
-                d3.select(_this).property("sorted", function (d) { return _state ? false : true; });
+                d3.select(_this).property("sorted", function (d) {
+                    return _state ? false : true;
+                });
 
-                if (_thisId !== "date_time") {
+                if (_thisId === "stid") {
+                    console.log("I'm in here! Help me!");
+                    rows.sort();
+                } else if (_thisId !== "date_time") {
                     rows.sort(function (a, b) {
                         // Typeguarding for null values.                   
                         var _a = a[d] === null ? -9999 : typeof a[d] === "object" ? a[d][0] : a[d];
                         var _b = b[d] === null ? -9999 : typeof b[d] === "object" ? b[d][0] : b[d];
                         return _state ? _a - _b : _b - _a;
                     });
-                } else if (_thisId === "stid"){
-                    rows.sort(a, b); 
                 };
-                
-        
+
+
                 d3.selectAll(".table-header").selectAll("i").classed("fa-chevron-circle-down", false);
                 d3.selectAll(".table-header").selectAll("i").classed("fa-chevron-circle-up", false);
 
                 d3.select("#" + _thisId).select("i")
-                    .classed("fa-chevron-circle-up", function () { return _state ? true : false; })
-                    .classed("fa-chevron-circle-down", function () { return !_state ? true : false; });
+                    .classed("fa-chevron-circle-up", function () {
+                        return _state ? true : false;
+                    })
+                    .classed("fa-chevron-circle-down", function () {
+                        return !_state ? true : false;
+                    });
             })
-            .append("i").attr("class", "sort-icon fa")
+        .append("i").attr("class", "sort-icon fa")
             .classed("fa-chevron-circle-down", function (d) {
                 return d === "dfp" ? true : false;
             });

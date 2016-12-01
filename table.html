@@ -49,6 +49,10 @@
             <label>Min: <input type="text" id="minValueWD" value="null"></label>
             <label>Max: <input type="text" id="maxValueWD" value="null"></label></br>
             <input type="button" value="Apply" onclick=_applyRule()></br>
+        </div>
+        <div class="current_url">
+            <label>URL to save: </label>
+            <input type="text" id="current_url_box" value="">
             <!--<p id= "new_url">
                 document.getElementById("new_url").text = url_string
                 </p>-->
@@ -67,13 +71,14 @@
         var minValueWD = document.getElementById('minValueWD').value;
         var maxValueWD = document.getElementById('maxValueWD').value;
         var current_url = window.location.href
-        console.log(current_url);
+        // console.log(current_url);
         var base_url = current_url.replace(/(&select=)\S+(\}\})/, "");
         var new_url = (base_url + "&select={\"air_temp\":{\"min\":"+minValueAT+
                     ",\"max\":"+maxValueAT+"},\"relative_humidity\":{\"min\":"+
                     minValueRH+",\"max\":"+maxValueRH+"},\"wind_speed\":{\"min\":"+
                     minValueWS+",\"max\":"+maxValueWS+"},\"wind_direction\":{\"min\":"+minValueWD+",\"max\":"+maxValueWD+"}}");
         window.location.href = new_url;
+        var current_url = new_url;
         };
 
 
@@ -86,5 +91,6 @@
 <script src="http://dev2.mesowest.net/tomato//assets/js/core/d3.v4.js"></script>
 <!--<script src="assets/js/core/d3.v4.min.js"></script>-->
 <script src="assets/js/apps/app-fireperimeter.js"></script>
+
 
 </html>
