@@ -23,10 +23,10 @@
     </style>
 </head>
 
-<body onload="_updateURL()">
+<body>
     <form>
         <!--onload="onload();"-->
-        <div id="input_form">
+        <div id="input_form.php">
             <!--form action="getForm.php" method="get">-->
             <!--<select id="variable">
                 <option>Air Temperature</option>
@@ -50,14 +50,14 @@
             <label>Max: <input type="text" id="maxValueWD" value="null"></label></br>
             <input type="button" value="Apply" onclick=_applyRule()></br>
         </div>
-        <div id="current_url">
+        <!--<div id="current_url">
             <label>URL to save: </label>
             <input type="text" id="current_url" value="">
             <!--<p id= "new_url">
                 document.getElementById("new_url").text = url_string
-                </p>-->
-        </div>
-    </form>
+                </p>
+        <!--</div>
+    <!--</form>-->
     <div id="nettable-container"></div>
     <!--</body>-->
     <script type="text/javascript">
@@ -81,15 +81,15 @@
         window.location.href = new_url;
         };
         
-    function _updateURL(){
-        // return window.location.href;
-        // d3.select("current_url").text(window.location.href);
-        var current_url = window.location.href
-        d3.selectAll("body").select("current_url").text(function (current_url) {
-                return current_url;
-                console.log(current_url);
-        });
-    };
+    // function _updateURL(){
+    //     // return window.location.href;
+    //     // d3.select("current_url").text(window.location.href);
+    //     var current_url = window.location.href
+    //     d3.selectAll("body").select("current_url").text(function (current_url) {
+    //             return current_url;
+    //             console.log(current_url);
+    //     });
+    // };
 
 
 </script>

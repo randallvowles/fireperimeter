@@ -20,6 +20,7 @@
         table_class: "",
         sensors: rankedSensors
     };
+    var headerNames = ["STID", "Distance From Perimeter", "Bearing From Perimeter", "Time From Observation", "Air Temperature", "Relative Humidity", "Wind Speed", "Wind Direction"];
     // d3.json("http://home.chpc.utah.edu/~u0540701/fireserver/sample_fire2.json", function(data){
     var stidStack = [];
     var stidAndDist = [];
@@ -117,10 +118,10 @@
         d3.select("body " + args.table_container).selectAll("table").remove();
         var table = d3.select("body " + args.table_container).append("table")
             .attr("id", args.table_id)
-
+            // .data(headerNames).enter().append("th")
         // Make the header
         table.append("thead").attr("class", "fixed-header").append("tr")
-            .selectAll("th").data(["stid"].concat(rankedSensors)).enter().append("th")
+            .selectAll("th").data(headerNames).enter().append("th")
             .html(function (d) {
                 return d;
             })
@@ -132,21 +133,27 @@
             .on('click', function (d) {
 
                 var _thisId = d3.select(this).attr("id");
+                console.log(_thisId);
                 var _this = this;
                 var _state = d3.select(this).property("sorted");
                 d3.select(_this).property("sorted", function (d) {
                     return _state ? false : true;
                 });
 
-                if (_thisId === "stid") {
+                if (_thisId === "STID") {
                     rows.sort(function (a, b) {
                         return _state ? b.stid.localeCompare(a.stid) : a.stid.localeCompare(b.stid);
-    });
-                } else if (_thisId !== "date_time") {
+    }); // if (_thisId !== "date_time")
+                } else {
+                    console.log("I'm here boss!");
+                    
                     rows.sort(function (a, b) {
+                        var newRS = ["stid"].concat(rankedSensors);
+                        var c = newRS[headerNames.indexOf(d)];
+                        console.log(c);
                         // Typeguarding for null values.                   
-                        var _a = a[d] === null ? -9999 : typeof a[d] === "object" ? a[d][0] : a[d];
-                        var _b = b[d] === null ? -9999 : typeof b[d] === "object" ? b[d][0] : b[d];
+                        var _a = a[c] === null ? -9999 : typeof a[c] === "object" ? a[c][0] : a[c];
+                        var _b = b[c] === null ? -9999 : typeof b[c] === "object" ? b[c][0] : b[c];
                         return _state ? _a - _b : _b - _a;
                     });
                 };
