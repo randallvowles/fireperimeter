@@ -110,8 +110,8 @@
             i++;
         }
 
-        console.log("Sorted stations with most recent ob");
-        console.log(stations);
+        // console.log("Sorted stations with most recent ob");
+        // console.log(stations);
 
         // Create and append table to DOM, but first check to see if we have a table node.
         d3.select("body " + args.table_container).selectAll("table").remove();
@@ -139,8 +139,9 @@
                 });
 
                 if (_thisId === "stid") {
-                    console.log("I'm in here! Help me!");
-                    rows.sort();
+                    rows.sort(function (a, b) {
+                        return _state ? b.stid.localeCompare(a.stid) : a.stid.localeCompare(b.stid);
+    });
                 } else if (_thisId !== "date_time") {
                     rows.sort(function (a, b) {
                         // Typeguarding for null values.                   
@@ -162,7 +163,7 @@
                         return !_state ? true : false;
                     });
             })
-        .append("i").attr("class", "sort-icon fa")
+            .append("i").attr("class", "sort-icon fa")
             .classed("fa-chevron-circle-down", function (d) {
                 return d === "dfp" ? true : false;
             });
