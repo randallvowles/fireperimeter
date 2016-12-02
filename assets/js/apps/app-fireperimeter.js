@@ -121,10 +121,12 @@
             // .data(headerNames).enter().append("th")
         // Make the header
         table.append("thead").attr("class", "fixed-header").append("tr")
-            .selectAll("th").data(headerNames).enter().append("th")
-            .html(function (d) {
-                return d;
-            })
+            .selectAll("th").data(["stid"].concat(rankedSensors)).enter().append("th")
+            .html(function (d, i) {
+                console.log(i);
+                return headerNames[i];
+                
+                        })
             .attr("id", function (d) {
                 return d;
             })
@@ -133,7 +135,7 @@
             .on('click', function (d) {
 
                 var _thisId = d3.select(this).attr("id");
-                console.log(_thisId);
+                // console.log(_thisId);
                 var _this = this;
                 var _state = d3.select(this).property("sorted");
                 d3.select(_this).property("sorted", function (d) {
@@ -145,15 +147,15 @@
                         return _state ? b.stid.localeCompare(a.stid) : a.stid.localeCompare(b.stid);
     }); // if (_thisId !== "date_time")
                 } else {
-                    console.log("I'm here boss!");
+                    // console.log("I'm here boss!");
                     
                     rows.sort(function (a, b) {
-                        var newRS = ["stid"].concat(rankedSensors);
-                        var c = newRS[headerNames.indexOf(d)];
-                        console.log(c);
+                        // var newRS = ["stid"].concat(rankedSensors);
+                        // var c = newRS[headerNames.indexOf(d)];
+                        // console.log(c);
                         // Typeguarding for null values.                   
-                        var _a = a[c] === null ? -9999 : typeof a[c] === "object" ? a[c][0] : a[c];
-                        var _b = b[c] === null ? -9999 : typeof b[c] === "object" ? b[c][0] : b[c];
+                        var _a = a[d] === null ? -9999 : typeof a[d] === "object" ? a[d][0] : a[d];
+                        var _b = b[d] === null ? -9999 : typeof b[d] === "object" ? b[d][0] : b[d];
                         return _state ? _a - _b : _b - _a;
                     });
                 };
@@ -161,7 +163,7 @@
 
                 d3.selectAll(".table-header").selectAll("i").classed("fa-chevron-circle-down", false);
                 d3.selectAll(".table-header").selectAll("i").classed("fa-chevron-circle-up", false);
-
+       
                 d3.select("#" + _thisId).select("i")
                     .classed("fa-chevron-circle-up", function () {
                         return _state ? true : false;
