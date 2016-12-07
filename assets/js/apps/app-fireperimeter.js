@@ -13,6 +13,7 @@
     var rankedSensors = ["air_temp", "relative_humidity", "wind_speed", "wind_direction"]
     apiArgs.vars = rankedSensors.join(",");
     apiArgs.units = "english";
+    apiArgs.qc = "all";
 
     var tableArgs = {
         table_container: "#nettable-container",
@@ -70,18 +71,51 @@
 
         rankedSensors.splice(1, 0, "bfp")
         rankedSensors.splice(2, 0, "date_time")
-        var stations = [];
+
+        // Should put all these styles in a class
+        var tooltip = d3.select("body")
+            .append("div")
+            .attr("class", "qc-tooltip")
+            .text("");
+
+        // Let's re-organize the response so it's easier to render as a table.
+        var qc_active = typeof _s.QC_FLAGGED !== "undefined" ? _s.QC_FLAGGED : false;
+        // var obsByTime = [];
+        var appendedRSS = ["stid"].concat(rankedSensors);
         var i = 0;
+        console.log(_s);
         var l = _s.length;
+        var j = 0;
+        var lj = appendedRSS.length;
+        var qc_bug_fix_1 = qc_active && typeof _s.QC !== "undefined" ? false : true;
+        var stations = [];
         while (i < l) {
             // We need to find the last element in the array, since that should be the most
             // current for the text range. Then we populate it with key/value pairs that 
             // contain the most recent value for the time period requested. As we go, we will
             // always be looking for null values and handling them.
-            if (typeof _s[i].OBSERVATIONS.date_time === "undefined") {
-                i++;
-                break;
-            }
+            // if (typeof _s[i].OBSERVATIONS.date_time === "undefined") {
+            //     i++;
+            //     break;
+            // }
+            while (j < lj) {
+
+                // if (
+                //         qc_bug_fix_1 ||
+                //         (!qc_active || typeof _s.QC[appendedRSS[j]] === "undefined")
+                //     ) {
+                stations.push(_s[i][appendedRSS[j]]);
+                //     }
+                //     else {
+                //         stations[i][appendedRSS[j]] =
+                //             [
+                //                 _s[i][appendedRSS[j]],
+                //                 _s.QC[appendedRSS[j]][i] === null ?
+                //                     false : _s.QC[appendedRSS[j]][i]
+                //             ];
+            // }
+            j++;
+            };
 
             var last = _s[i].OBSERVATIONS.date_time.length - 1
             var tmp = {};
@@ -119,14 +153,14 @@
         var table = d3.select("body " + args.table_container).append("table")
             .attr("id", args.table_id)
             // .data(headerNames).enter().append("th")
-        // Make the header
+            // Make the header
         table.append("thead").attr("class", "fixed-header").append("tr")
             .selectAll("th").data(["stid"].concat(rankedSensors)).enter().append("th")
             .html(function (d, i) {
-                console.log(i);
+                // console.log(i); 
                 return headerNames[i];
-                
-                        })
+
+            })
             .attr("id", function (d) {
                 return d;
             })
@@ -142,13 +176,13 @@
                     return _state ? false : true;
                 });
 
-                if (_thisId === "STID") {
+                if (_thisId === "stid") {
                     rows.sort(function (a, b) {
                         return _state ? b.stid.localeCompare(a.stid) : a.stid.localeCompare(b.stid);
-    }); // if (_thisId !== "date_time")
+                    }); // if (_thisId !== "date_time")
                 } else {
                     // console.log("I'm here boss!");
-                    
+
                     rows.sort(function (a, b) {
                         // var newRS = ["stid"].concat(rankedSensors);
                         // var c = newRS[headerNames.indexOf(d)];
@@ -163,7 +197,7 @@
 
                 d3.selectAll(".table-header").selectAll("i").classed("fa-chevron-circle-down", false);
                 d3.selectAll(".table-header").selectAll("i").classed("fa-chevron-circle-up", false);
-       
+
                 d3.select("#" + _thisId).select("i")
                     .classed("fa-chevron-circle-up", function () {
                         return _state ? true : false;
@@ -180,7 +214,7 @@
         // Create the rows
         var rows = table.append("tbody").attr("class", "scrollable")
             .selectAll("tr").data(stations).enter().append("tr");
-
+        console.log(stations);
         // Create and populate the cells
         var cells = rows.selectAll('td')
             .data(function (row) {
