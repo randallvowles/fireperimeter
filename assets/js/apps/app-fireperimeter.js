@@ -21,8 +21,8 @@
         table_class: "",
         sensors: rankedSensors
     };
-    var headerNames = ["STID", "Distance From Perimeter", "Bearing From Perimeter",
-        "Time From Observation", "Air Temperature", "Relative Humidity", "Wind Speed", "Wind Direction"
+    var headerNames = ["STID", "Distance From Perimeter (miles)", "Bearing From Perimeter (degrees)",
+        "Time From Observation (minutes)", "Air Temperature (deg F)", "Relative Humidity (%)", "Wind Speed (mph)", "Wind Direction (degrees)"
     ];
     var stidStack = [];
     var stidAndDist = [];
@@ -259,9 +259,9 @@
                 continue;
             }
         }
-        console.log("Stations with QC Flags " + qcFlagged);
+        console.log("Stations with QC Flags: " + qcFlagged);
         d3.selectAll(".stid").classed("boom", function(){
-            return (d3.select(this).text()).includes(qcFlagged) == true ? true : false;
+            return (qcFlagged.includes(d3.select(this).text())) == true ? true : false;
         })
     }
 
