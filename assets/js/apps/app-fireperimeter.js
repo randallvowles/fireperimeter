@@ -32,9 +32,7 @@
 
     };
 
-    // console.log(stidAndDist);
     var stidList = stidStack.join(",");
-    // console.log(stidList);
     apiArgs.stid = stidList;
     M.fetch({
         api_args: apiArgs
@@ -80,10 +78,8 @@
 
         // Let's re-organize the response so it's easier to render as a table.
         var qc_active = typeof _s.QC_FLAGGED !== "undefined" ? _s.QC_FLAGGED : false;
-        // var obsByTime = [];
         var appendedRSS = ["stid"].concat(rankedSensors);
         var i = 0;
-        console.log(_s);
         var l = _s.length;
         var j = 0;
         var lj = appendedRSS.length;
@@ -98,26 +94,26 @@
             //     i++;
             //     break;
             // }
-            while (j < lj) {
+            // while (j < lj) {
 
-                // if (
-                //         qc_bug_fix_1 ||
-                //         (!qc_active || typeof _s.QC[appendedRSS[j]] === "undefined")
-                //     ) {
-                stations.push(_s[i][appendedRSS[j]]);
-                //     }
-                //     else {
-                //         stations[i][appendedRSS[j]] =
-                //             [
-                //                 _s[i][appendedRSS[j]],
-                //                 _s.QC[appendedRSS[j]][i] === null ?
-                //                     false : _s.QC[appendedRSS[j]][i]
-                //             ];
-            // }
-            j++;
-            };
+            //     // if (
+            //     //         qc_bug_fix_1 ||
+            //     //         (!qc_active || typeof _s.QC[appendedRSS[j]] === "undefined")
+            //     //     ) {
+            //     stations.push(_s[i][appendedRSS[j]]);
+            //     //     }
+            //     //     else {
+            //     //         stations[i][appendedRSS[j]] =
+            //     //             [
+            //     //                 _s[i][appendedRSS[j]],
+            //     //                 _s.QC[appendedRSS[j]][i] === null ?
+            //     //                     false : _s.QC[appendedRSS[j]][i]
+            //     //             ];
+            // // }
+            // j++;
+            // };
 
-            var last = _s[i].OBSERVATIONS.date_time.length - 1
+            var last = _s[i].OBSERVATIONS.date_time.length - 1;
             var tmp = {};
             tmp.stid = _s[i].STID;
 
@@ -214,7 +210,6 @@
         // Create the rows
         var rows = table.append("tbody").attr("class", "scrollable")
             .selectAll("tr").data(stations).enter().append("tr");
-        console.log(stations);
         // Create and populate the cells
         var cells = rows.selectAll('td')
             .data(function (row) {
@@ -284,4 +279,7 @@
             // i++;
         };
     };
+
+
+
 })();
