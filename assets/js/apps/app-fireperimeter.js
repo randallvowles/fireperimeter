@@ -21,15 +21,15 @@
         table_class: "",
         sensors: rankedSensors
     };
-    var headerNames = ["STID", "Distance From Perimeter", "Bearing From Perimeter", "Time From Observation", "Air Temperature", "Relative Humidity", "Wind Speed", "Wind Direction"];
-    // d3.json("http://home.chpc.utah.edu/~u0540701/fireserver/sample_fire2.json", function(data){
+    var headerNames = ["STID", "Distance From Perimeter", "Bearing From Perimeter",
+        "Time From Observation", "Air Temperature", "Relative Humidity", "Wind Speed", "Wind Direction"
+    ];
     var stidStack = [];
     var stidAndDist = [];
     var key;
     for (key in sample_fire.nearest_stations) {
         stidStack.push(sample_fire.nearest_stations[key]["STID"]);
         stidAndDist.push(sample_fire.nearest_stations[key]["DFP"]);
-
     };
 
     var stidList = stidStack.join(",");
@@ -38,16 +38,13 @@
         api_args: apiArgs
     });
     var filter = JSON.parse(M.windowArgs().select)
-        // console.log(filter);
-        // console.log(Object.keys(filter).length);
 
     M.printResponse();
     $.when(M.async()).done(function () {
         _networkTableEmitter(M, tableArgs);
         _highlightCells(filter);
+        _highlightQC(M.response);
     });
-
-
     return
 
     /**
@@ -66,7 +63,6 @@
         // back in to.  Once the sensors are ranked, we will create a sorted output that
         // will be ready to generate a table from.
         rankedSensors.splice(0, 0, "dfp")
-
         rankedSensors.splice(1, 0, "bfp")
         rankedSensors.splice(2, 0, "date_time")
 
@@ -90,46 +86,20 @@
             // current for the text range. Then we populate it with key/value pairs that 
             // contain the most recent value for the time period requested. As we go, we will
             // always be looking for null values and handling them.
-            // if (typeof _s[i].OBSERVATIONS.date_time === "undefined") {
-            //     i++;
-            //     break;
-            // }
-            // while (j < lj) {
-
-            //     // if (
-            //     //         qc_bug_fix_1 ||
-            //     //         (!qc_active || typeof _s.QC[appendedRSS[j]] === "undefined")
-            //     //     ) {
-            //     stations.push(_s[i][appendedRSS[j]]);
-            //     //     }
-            //     //     else {
-            //     //         stations[i][appendedRSS[j]] =
-            //     //             [
-            //     //                 _s[i][appendedRSS[j]],
-            //     //                 _s.QC[appendedRSS[j]][i] === null ?
-            //     //                     false : _s.QC[appendedRSS[j]][i]
-            //     //             ];
-            // // }
-            // j++;
-            // };
 
             var last = _s[i].OBSERVATIONS.date_time.length - 1;
             var tmp = {};
             tmp.stid = _s[i].STID;
-
             rankedSensors.map(function (d) {
                 // console.log(d)
                 // console.log(stidAndDist[i][0])
                 // Best to use terinary logic here, but for simplicity...
                 if (d === "dfp") {
                     tmp[d] = (stidAndDist[i][0]).toFixed(2);
-
                 } else if (d === "bfp") {
                     tmp[d] = (stidAndDist[i][1]).toFixed(0);
                 } else if (typeof _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"] === "undefined") {
                     tmp[d] = null;
-
-
                 } else {
                     tmp[d] = _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last]
                 }
@@ -137,7 +107,6 @@
 
             // Append to our new `stations` array            
             stations.push(tmp);
-
             i++;
         }
 
@@ -155,7 +124,6 @@
             .html(function (d, i) {
                 // console.log(i); 
                 return headerNames[i];
-
             })
             .attr("id", function (d) {
                 return d;
@@ -163,7 +131,6 @@
             .classed("table-header", true)
             .property("sorted", false)
             .on('click', function (d) {
-
                 var _thisId = d3.select(this).attr("id");
                 // console.log(_thisId);
                 var _this = this;
@@ -171,14 +138,12 @@
                 d3.select(_this).property("sorted", function (d) {
                     return _state ? false : true;
                 });
-
                 if (_thisId === "stid") {
                     rows.sort(function (a, b) {
                         return _state ? b.stid.localeCompare(a.stid) : a.stid.localeCompare(b.stid);
                     }); // if (_thisId !== "date_time")
                 } else {
                     // console.log("I'm here boss!");
-
                     rows.sort(function (a, b) {
                         // var newRS = ["stid"].concat(rankedSensors);
                         // var c = newRS[headerNames.indexOf(d)];
@@ -189,11 +154,8 @@
                         return _state ? _a - _b : _b - _a;
                     });
                 };
-
-
                 d3.selectAll(".table-header").selectAll("i").classed("fa-chevron-circle-down", false);
                 d3.selectAll(".table-header").selectAll("i").classed("fa-chevron-circle-up", false);
-
                 d3.select("#" + _thisId).select("i")
                     .classed("fa-chevron-circle-up", function () {
                         return _state ? true : false;
@@ -228,6 +190,7 @@
                 return (d.name)
             })
     }
+
 
     /**
      * Highlights Cells based on user-defined parameters
@@ -280,6 +243,26 @@
         };
     };
 
-
+    /**
+     * Highlights Cells based on API QC flags
+     * @param {object} API response
+     */
+    function _highlightQC(object) {
+        var _r = M.response;
+        var _s = _r.station;
+        var qcFlagged = [];
+        var i;
+        for (i in _s){
+            if (_s[i]["QC_FLAGGED"] == true){
+                qcFlagged.push(_s[i]["STID"]);
+            } else {
+                continue;
+            }
+        }
+        console.log("Stations with QC Flags " + qcFlagged);
+        d3.selectAll(".stid").classed("boom", function(){
+            return (d3.select(this).text()).includes(qcFlagged) == true ? true : false;
+        })
+    }
 
 })();
