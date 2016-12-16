@@ -57,11 +57,11 @@
         var _r = M.response;
         var _s = _r.station;
         var rankedSensors = args.sensors;
-
-        // Insert the `date_time` value into `rankedSensors`, we do this to make sure 
-        // we generate the table correctly.  We also want an array to put our sorted keys
-        // back in to.  Once the sensors are ranked, we will create a sorted output that
-        // will be ready to generate a table from.
+        var baseURL = ["http://mesowest.utah.edu/cgi-bin/droman/meso_base_dyn.cgi?stn="]
+            // Insert the `date_time` value into `rankedSensors`, we do this to make sure 
+            // we generate the table correctly.  We also want an array to put our sorted keys
+            // back in to.  Once the sensors are ranked, we will create a sorted output that
+            // will be ready to generate a table from.
         rankedSensors.splice(0, 0, "dfp")
         rankedSensors.splice(1, 0, "bfp")
         rankedSensors.splice(2, 0, "date_time")
@@ -178,7 +178,7 @@
                 return ["stid"].concat(rankedSensors).map(function (d) {
                     return {
                         name: d,
-                        value: row[d] === null ? "" : row[d]
+                        value: row[d] === null ? "" : row[d],
                     };
                 });
             })
@@ -188,7 +188,28 @@
             })
             .attr("class", function (d) {
                 return (d.name)
+                })
+            // .selectAll(".stid")
+            // .append("a")
+            // .attr("xlink:href", function(d){
+            //         return baseURL+d.value;
+                
+            // })
+
+
+        var hyperlink = d3.selectAll(".stid")
+            .append("a")
+            // .text(function(d){
+            //     return d.value
+            // })
+            .attr("xlink:href", function(d){
+                return baseURL+d3.select(this).text();
             })
+
+        // var hyperlink = d3.select(".stid").append("p").data(baseURL).enter().html(function (d) {
+        //     var link = baseURL + d3.select(this).text();
+        //     return "<a href=\"" + link + "\">" + d3.select(this).text() + "</a>";
+        // })
     }
 
 
@@ -252,15 +273,15 @@
         var _s = _r.station;
         var qcFlagged = [];
         var i;
-        for (i in _s){
-            if (_s[i]["QC_FLAGGED"] == true){
+        for (i in _s) {
+            if (_s[i]["QC_FLAGGED"] == true) {
                 qcFlagged.push(_s[i]["STID"]);
             } else {
                 continue;
             }
         }
         console.log("Stations with QC Flags: " + qcFlagged);
-        d3.selectAll(".stid").classed("boom", function(){
+        d3.selectAll(".stid").classed("boom", function () {
             return (qcFlagged.includes(d3.select(this).text())) == true ? true : false;
         })
     }
