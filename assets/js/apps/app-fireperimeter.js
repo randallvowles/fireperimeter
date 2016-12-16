@@ -43,7 +43,7 @@
     $.when(M.async()).done(function () {
         _networkTableEmitter(M, tableArgs);
         _highlightCells(filter);
-        _highlightQC(M.response);
+        // _highlightQC(M.response);
     });
     return
 
