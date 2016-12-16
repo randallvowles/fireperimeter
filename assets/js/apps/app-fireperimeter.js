@@ -197,14 +197,14 @@
             // })
 
 
-        var hyperlink = d3.selectAll(".stid")
-            .append("a")
-            // .text(function(d){
-            //     return d.value
-            // })
-            .attr("xlink:href", function(d){
-                return baseURL+d3.select(this).text();
-            })
+        // var hyperlink = d3.selectAll(".stid")
+        //     .append("a")
+        //     // .text(function(d){
+        //     //     return d.value
+        //     // })
+        //     .attr("xlink:href", function(d){
+        //         return baseURL+d3.select(this).text();
+        //     })
 
         // var hyperlink = d3.select(".stid").append("p").data(baseURL).enter().html(function (d) {
         //     var link = baseURL + d3.select(this).text();
