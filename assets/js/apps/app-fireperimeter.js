@@ -43,7 +43,7 @@
     $.when(M.async()).done(function () {
         _networkTableEmitter(M, tableArgs);
         _highlightCells(filter);
-        // _highlightQC(M.response);
+        _highlightQC(M.response);
     });
     return
 
@@ -184,20 +184,30 @@
             })
             .enter().append("td")
             .text(function (d) {
-                return d.value
+                // if (typeof(d) == "string"){
+                    // return ""
+                // } else {
+                    return d.value
+                // }
             })
             .attr("class", function (d) {
                 return (d.name)
-                })
-            // .selectAll(".stid")
-            // .append("a")
-            // .attr("xlink:href", function(d){
-            //         return baseURL+d.value;
-                
-            // })
-
+            })
 
         // var hyperlink = d3.selectAll(".stid")
+        //     .append("a")
+        //     .text(function (d) {
+        //         return d.value
+        //     })
+            // .attr("xlink:href", function (d) {
+            //     var stid1 = d3.select(this).text();
+            //     return baseURL + stid1
+            // });
+
+        var hyperlink = d3.selectAll(".stid")
+            .on("click", function() {
+                window.open(baseURL+d3.select(this).text()); 
+        });
         //     .append("a")
         //     // .text(function(d){
         //     //     return d.value
