@@ -10,7 +10,7 @@
     var apiArgs = M.windowArgs();
 
     // Force a set of variables
-    var rankedSensors = ["air_temp", "relative_humidity", "wind_speed", "wind_direction"]
+    var rankedSensors = ["air_temp", "relative_humidity", "wind_speed", "wind_direction", "weather_condition"]
     apiArgs.vars = rankedSensors.join(",");
     apiArgs.units = "english";
     apiArgs.qc = "all";
@@ -22,7 +22,8 @@
         sensors: rankedSensors
     };
     var headerNames = ["STID", "Distance From Perimeter (miles)", "Bearing From Perimeter (degrees)",
-        "Time From Observation (minutes)", "Air Temperature (deg F)", "Relative Humidity (%)", "Wind Speed (mph)", "Wind Direction (degrees)"
+        "Time From Observation (minutes)", "Air Temperature (deg F)", "Relative Humidity (%)",
+        "Wind Speed (mph)", "Wind Direction (degrees)", "Weather Condition"
     ];
     var stidStack = [];
     var stidAndDist = [];
@@ -91,13 +92,19 @@
             var tmp = {};
             tmp.stid = _s[i].STID;
             rankedSensors.map(function (d) {
-                // console.log(d)
+                // console.log(i)
                 // console.log(stidAndDist[i][0])
                 // Best to use terinary logic here, but for simplicity...
                 if (d === "dfp") {
                     tmp[d] = (stidAndDist[i][0]).toFixed(2);
                 } else if (d === "bfp") {
                     tmp[d] = (stidAndDist[i][1]).toFixed(0);
+                } else if (d === "weather_condition") {
+                    try {
+                        tmp[d] = _s[i].OBSERVATIONS["weather_condition_set_1d"][last]
+                    } catch (e) {
+                        tmp[d] = null;
+                    }
                 } else if (typeof _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"] === "undefined") {
                     tmp[d] = null;
                 } else {
@@ -143,11 +150,7 @@
                         return _state ? b.stid.localeCompare(a.stid) : a.stid.localeCompare(b.stid);
                     }); // if (_thisId !== "date_time")
                 } else {
-                    // console.log("I'm here boss!");
                     rows.sort(function (a, b) {
-                        // var newRS = ["stid"].concat(rankedSensors);
-                        // var c = newRS[headerNames.indexOf(d)];
-                        // console.log(c);
                         // Typeguarding for null values.                   
                         var _a = a[d] === null ? -9999 : typeof a[d] === "object" ? a[d][0] : a[d];
                         var _b = b[d] === null ? -9999 : typeof b[d] === "object" ? b[d][0] : b[d];
@@ -184,42 +187,16 @@
             })
             .enter().append("td")
             .text(function (d) {
-                // if (typeof(d) == "string"){
-                    // return ""
-                // } else {
-                    return d.value
-                // }
+                return d.value
             })
             .attr("class", function (d) {
                 return (d.name)
             })
 
-        // var hyperlink = d3.selectAll(".stid")
-        //     .append("a")
-        //     .text(function (d) {
-        //         return d.value
-        //     })
-            // .attr("xlink:href", function (d) {
-            //     var stid1 = d3.select(this).text();
-            //     return baseURL + stid1
-            // });
-
         var hyperlink = d3.selectAll(".stid")
-            .on("click", function() {
-                window.open(baseURL+d3.select(this).text()); 
-        });
-        //     .append("a")
-        //     // .text(function(d){
-        //     //     return d.value
-        //     // })
-        //     .attr("xlink:href", function(d){
-        //         return baseURL+d3.select(this).text();
-        //     })
-
-        // var hyperlink = d3.select(".stid").append("p").data(baseURL).enter().html(function (d) {
-        //     var link = baseURL + d3.select(this).text();
-        //     return "<a href=\"" + link + "\">" + d3.select(this).text() + "</a>";
-        // })
+            .on("click", function () {
+                window.open(baseURL + d3.select(this).text());
+            });
     }
 
 
