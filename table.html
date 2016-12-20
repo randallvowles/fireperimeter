@@ -4,6 +4,7 @@
 
 <head>
     <link href='assets/fonts/font-awesome-4.7.0/css/font-awesome.min.css' rel="stylesheet">
+    <link href='assets/css/main.css' rel="stylesheet">
     <script src="assets/js/core/baseplate.js"></script>
     <style>
         td,
@@ -42,11 +43,13 @@
             <label>Wind Direction - </label>
             <label>Min: <input type="text" id="minValueWD" value="null"></label>
             <label>Max: <input type="text" id="maxValueWD" value="null"></label></br>
-            <input type="button" value="Apply" onclick=_applyRule()></br>
+            <input type="button" value="Apply" onclick=_applyRule()>
+            <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" id="exclusions"></label></br>
+
         </div>
         <div id="nettable-container"></div>
         <script type="text/javascript">
-            _applyRule = function (new_url) {
+            _applyRule = function () {
                 var minValueAT = document.getElementById('minValueAT').value;
                 var maxValueAT = document.getElementById('maxValueAT').value;
                 var minValueRH = document.getElementById('minValueRH').value;
@@ -63,7 +66,16 @@
                     minValueWS + ",\"max\":" + maxValueWS + "},\"wind_direction\":{\"min\":" + minValueWD +
                     ",\"max\":" + maxValueWD + "}}");
                 window.location.href = new_url;
+            // _highlightCells(new_url);
             };
+            // _excludeNonHighlightedCells = function (){
+            //     if (document.getElementById("exclusions").checked) {
+            //         // If clicked, hide all NOT "bang"
+            //         d3.selectAll("bang")
+            //     } else {
+            //         // If not clicked, show all stid's
+            //     }
+            // }
         </script>
 </body>
 <script src="assets/js/core/mesonet-current.min.js"></script>
