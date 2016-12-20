@@ -14,6 +14,8 @@
     apiArgs.vars = rankedSensors.join(",");
     apiArgs.units = "english";
     apiArgs.qc = "all";
+    apiArgs.recent = "61"
+    apiArgs.timeformat = "%s"
 
     var tableArgs = {
         table_container: "#nettable-container",
@@ -38,13 +40,18 @@
     M.fetch({
         api_args: apiArgs
     });
-    var filter = JSON.parse(M.windowArgs().select)
+    var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
 
     M.printResponse();
     $.when(M.async()).done(function () {
         _networkTableEmitter(M, tableArgs);
         _highlightCells(filter);
         _highlightQC(M.response);
+        // d3.select("applyRule").on("click", function () {
+        //     _highlightCells(filter);
+        // })
+
+
     });
     return
 
@@ -196,6 +203,11 @@
             .on("click", function () {
                 window.open(baseURL + d3.select(this).text());
             });
+        var timeConversion = d3.selectAll(".date_time")
+            .text(function(d){
+                var timeNow = String(Date.now()).slice(0,-3);
+                return ((timeNow - d.value) / 60);
+            })
     }
 
 
@@ -244,7 +256,7 @@
                 // return false;
                 continue;
             } else {
-                console.log("Bang! Bang! Something went terribly wrong!!!!!")
+                console.log("Bang! Bang! Something went terribly wrong!")
             };
             // i++;
         };
@@ -262,6 +274,7 @@
         for (i in _s) {
             if (_s[i]["QC_FLAGGED"] == true) {
                 qcFlagged.push(_s[i]["STID"]);
+
             } else {
                 continue;
             }
