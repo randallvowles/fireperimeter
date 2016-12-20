@@ -139,7 +139,6 @@
             .property("sorted", false)
             .on('click', function (d) {
                 var _thisId = d3.select(this).attr("id");
-                // console.log(_thisId);
                 var _this = this;
                 var _state = d3.select(this).property("sorted");
                 d3.select(_this).property("sorted", function (d) {
