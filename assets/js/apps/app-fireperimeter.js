@@ -64,6 +64,8 @@
 
         var _r = M.response;
         var _s = _r.station;
+        var U = new Units();
+
         var rankedSensors = args.sensors;
         var baseURL = ["http://mesowest.utah.edu/cgi-bin/droman/meso_base_dyn.cgi?stn="]
             // Insert the `date_time` value into `rankedSensors`, we do this to make sure 
@@ -99,35 +101,39 @@
             var tmp = {};
             tmp.stid = _s[i].STID;
             rankedSensors.map(function (d) {
-                // console.log(i)
-                // console.log(stidAndDist[i][0])
-                // Best to use terinary logic here, but for simplicity...
-                if (d === "dfp") {
-                    tmp[d] = (stidAndDist[i][0]);
-                } else if (d === "bfp") {
-                    tmp[d] = (stidAndDist[i][1]);
-                } else if (d === "weather_condition") {
-                    try {
-                        tmp[d] = _s[i].OBSERVATIONS["weather_condition_set_1d"][last]
-                    } catch (e) {
-                        tmp[d] = null;
-                    }
-                } else if (typeof _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"] === "undefined") {
-                    tmp[d] = null;
-                } else {
-                    if (_s[i]["QC_FLAGGED"] == true && d !== "date_time") {
-                        for (j in _s[i].QC) {
-                            tmp[d] = [_s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last],
-                                _s[i].QC[j] === null ? false : _s[i].QC[j]
-                            ];
+                    // console.log(i)
+                    // console.log(stidAndDist[i][0])
+                    // Best to use terinary logic here, but for simplicity...
+                    if (d === "dfp") {
+                        tmp[d] = (stidAndDist[i][0]);
+                    } else if (d === "bfp") {
+                        tmp[d] = (stidAndDist[i][1]);
+                    } else if (d === "weather_condition") {
+                        try {
+                            tmp[d] = _s[i].OBSERVATIONS["weather_condition_set_1d"][last]
+                        } catch (e) {
+                            tmp[d] = null;
                         }
+                    } else if (typeof _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"] === "undefined") {
+                        tmp[d] = null;
                     } else {
-                        tmp[d] = (_s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last])
-                    }
-                }
-            })
+                        if (_s[i]["QC_FLAGGED"] == true && d !== "date_time") {
+                            var _d = _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last]
+                            for (j in _s[i].QC) {
+                                if (_s[i].QC[j] === d) {
+                                    var _qcFlag = _s[i].QC[j][last]
+                                    tmp[d] = [_d, _qcFlag]
+                                } else {
+                                    tmp[d] = [_d]
+                                }
+                            };
 
-            // Append to our new `stations` array            
+                        } else {
+                            tmp[d] = (_s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last])
+                        }
+                    }
+                })
+                // Append to our new `stations` array
             stations.push(tmp);
             i++;
         }
@@ -205,15 +211,19 @@
                 _v = typeof d.value === "undefined" ? "" : typeof d.value === "object" ?
                     d.value[0] : d.value;
                 _v = typeof _v === "boolean" ? "" : _v;
-                // var _p = d !== "wind_direction" || d !== "relative_humidity" ? 0 : 1;
-                return d.name === "date_time" || d.name === "weather_condition" || d.name === "stid" ?
-                    d.value : d.name === "relative_humidity" || d.name === "wind_direction" || d.name === "bfp" ? Number(_v).toFixed(0) : Number(_v).toFixed(1);
-                // return d.value
+                var _p = typeof _r.sensor.units[0][d.name.split("_set_")[0]] === "undefined" ?
+                    2 : U.get(_r.sensor.units[0][d.name.split("_set_")[0]]).precision;
+                return d.name === "date_time" ?
+                    d.value : typeof _v === "number" ? Number(_v).toFixed(_p) : _v;
+                // return d.value;
             })
             .attr("class", function (d) {
                 return (d.name)
             })
             // add bang/qcbang attr call here
+            .attr("classed", function () {
+
+            })
 
         var hyperlink = d3.selectAll(".stid")
             .on("click", function () {
@@ -297,7 +307,9 @@
             }
         }
         // console.log("Stations with QC Flags: " + qcFlagged);
-        d3.selectAll(".stid").classed("boom", function () {
+        d3.selectAll("td").classed("boom", function (d) {
+            console.log(d);
+            // return typeof d.value === "object" && !!d.value[1] ? true : false;
             return (qcFlagged.includes(d3.select(this).text())) == true ? true : false;
         })
     }
