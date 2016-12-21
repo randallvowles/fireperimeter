@@ -103,9 +103,9 @@
                 // console.log(stidAndDist[i][0])
                 // Best to use terinary logic here, but for simplicity...
                 if (d === "dfp") {
-                    tmp[d] = (stidAndDist[i][0]).toFixed(2);
+                    tmp[d] = (stidAndDist[i][0]);
                 } else if (d === "bfp") {
-                    tmp[d] = (stidAndDist[i][1]).toFixed(0);
+                    tmp[d] = (stidAndDist[i][1]);
                 } else if (d === "weather_condition") {
                     try {
                         tmp[d] = _s[i].OBSERVATIONS["weather_condition_set_1d"][last]
@@ -115,7 +115,15 @@
                 } else if (typeof _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"] === "undefined") {
                     tmp[d] = null;
                 } else {
-                    tmp[d] = _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last]
+                    if (_s[i]["QC_FLAGGED"] == true && d !== "date_time") {
+                        for (j in _s[i].QC) {
+                            tmp[d] = [_s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last],
+                                _s[i].QC[j] === null ? false : _s[i].QC[j]
+                            ];
+                        }
+                    } else {
+                        tmp[d] = (_s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last])
+                    }
                 }
             })
 
@@ -193,20 +201,28 @@
             })
             .enter().append("td")
             .text(function (d) {
-                return d.value
+                var _v = (d.name).split("_set_");
+                _v = typeof d.value === "undefined" ? "" : typeof d.value === "object" ?
+                    d.value[0] : d.value;
+                _v = typeof _v === "boolean" ? "" : _v;
+                // var _p = d !== "wind_direction" || d !== "relative_humidity" ? 0 : 1;
+                return d.name === "date_time" || d.name === "weather_condition" || d.name === "stid" ?
+                    d.value : d.name === "relative_humidity" || d.name === "wind_direction" || d.name === "bfp" ? Number(_v).toFixed(0) : Number(_v).toFixed(1);
+                // return d.value
             })
             .attr("class", function (d) {
                 return (d.name)
             })
+            // add bang/qcbang attr call here
 
         var hyperlink = d3.selectAll(".stid")
             .on("click", function () {
                 window.open(baseURL + d3.select(this).text());
             });
         var timeConversion = d3.selectAll(".date_time")
-            .text(function(d){
-                var timeNow = String(Date.now()).slice(0,-3);
-                return ((timeNow - d.value) / 60);
+            .text(function (d) {
+                var timeNow = String(Date.now()).slice(0, -3);
+                return ((timeNow - d.value) / 60).toFixed(0);
             })
     }
 
@@ -221,6 +237,7 @@
         var i = 0;
         var li = Object.keys(filter).length
         var key;
+
         // while (i < li) {
         for (key in Object.keys(filter)) {
             var selector = (Object.keys(filter))[key];
@@ -228,7 +245,7 @@
             // assign min/max values, test for null
             var A = typeof filter[selector].min === "undefined" ? null : filter[selector].min;
             var B = typeof filter[selector].max === "undefined" ? null : filter[selector].max;
-            console.log("Min = " + A)
+            console.log("Min = " + A);
             console.log("Max = " + B);
             if (typeof selector === "undefined") {
                 return false;
@@ -279,7 +296,7 @@
                 continue;
             }
         }
-        console.log("Stations with QC Flags: " + qcFlagged);
+        // console.log("Stations with QC Flags: " + qcFlagged);
         d3.selectAll(".stid").classed("boom", function () {
             return (qcFlagged.includes(d3.select(this).text())) == true ? true : false;
         })
