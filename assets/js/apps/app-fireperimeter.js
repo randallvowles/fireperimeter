@@ -23,7 +23,7 @@
         table_class: "",
         sensors: rankedSensors
     };
-    var headerNames = ["STID", "Distance From Perimeter (miles)", "Bearing From Perimeter (degrees)",
+    var headerNames = ["Station ID (STID)", "Distance From Fire Perimeter (miles)", "Bearing From Fire Perimeter (degrees)",
         "Time From Observation (minutes)", "Air Temperature (deg F)", "Relative Humidity (%)",
         "Wind Speed (mph)", "Wind Direction (degrees)", "Weather Condition"
     ];
@@ -105,36 +105,41 @@
                     // console.log(stidAndDist[i][0])
                     // Best to use terinary logic here, but for simplicity...
                     if (d === "dfp") {
-                        tmp[d] = (stidAndDist[i][0]);
+                        tmp[d] = [stidAndDist[i][0]];
                     } else if (d === "bfp") {
-                        tmp[d] = (stidAndDist[i][1]);
+                        tmp[d] = [stidAndDist[i][1]];
                     } else if (d === "weather_condition") {
                         try {
-                            tmp[d] = _s[i].OBSERVATIONS["weather_condition_set_1d"][last]
+                            tmp[d] = [_s[i].OBSERVATIONS["weather_condition_set_1d"][last]]
                         } catch (e) {
-                            tmp[d] = null;
+                            tmp[d] = [null];
                         }
                     } else if (typeof _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"] === "undefined") {
-                        tmp[d] = null;
-                    } else {
-                        if (_s[i]["QC_FLAGGED"] == true && d !== "date_time") {
-                            var _d = _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last]
-                            for (j in _s[i].QC) {
-                                if (_s[i].QC[j] === d) {
-                                    var _qcFlag = _s[i].QC[j][last]
-                                    tmp[d] = [_d, _qcFlag]
-                                } else {
-                                    tmp[d] = [_d]
-                                }
-                            };
-
-                        } else {
-                            tmp[d] = (_s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last])
+                        tmp[d] = [null];
+                    } else if (_s[i]["QC_FLAGGED"] == true && d !== "date_time") {
+                        // console.log(_s[i])
+                        var _d = _s[i].OBSERVATIONS[d + "_set_1"][last]
+                            // var j = 0;
+                        for (var j in _s[i].QC) {
+                            // console.log(_s[i].QC);
+                            // console.log(d);
+                            if (typeof _s[i].QC[d + "_set_1"] !== "undefined") {
+                                // var _qcFlag = _s[i].QC
+                                console.log(_s[i].QC[d + "_set_1"])
+                                tmp[d] = [_d, _s[i].QC[d + "_set_1"]]
+                            } else {
+                                tmp[d] = [_d]
+                            }
                         }
+
+                    } else {
+                        tmp[d] = [_s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last]]
                     }
                 })
                 // Append to our new `stations` array
             stations.push(tmp);
+            tmp = []
+                // console.log(stations)
             i++;
         }
 
@@ -294,23 +299,27 @@
      * @param {object} API response
      */
     function _highlightQC(object) {
-        var _r = M.response;
-        var _s = _r.station;
-        var qcFlagged = [];
-        var i;
-        for (i in _s) {
-            if (_s[i]["QC_FLAGGED"] == true) {
-                qcFlagged.push(_s[i]["STID"]);
+        // var _r = M.response;
+        // var _s = _r.station;
+        // var qcFlagged = [];
+        // var i;
+        // for (i in _s) {
+        //     if (_s[i]["QC_FLAGGED"] == true) {
+        //         qcFlagged.push(_s[i]["STID"]);
 
-            } else {
-                continue;
-            }
-        }
-        // console.log("Stations with QC Flags: " + qcFlagged);
+        //     } else {
+        //         continue;
+        //     }
+        // }
         d3.selectAll("td").classed("boom", function (d) {
-            console.log(d);
-            // return typeof d.value === "object" && !!d.value[1] ? true : false;
-            return (qcFlagged.includes(d3.select(this).text())) == true ? true : false;
+            return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
+        })
+        d3.selectAll("td").classed("qcbang", function (d) {
+            if (d3.select(this).classed("boom") === true && d3.select(this).classed("bang") === true) {
+                return true
+            } else {
+                return false
+            }
         })
     }
 
