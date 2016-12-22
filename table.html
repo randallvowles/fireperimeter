@@ -20,15 +20,18 @@
         
         .bang {
             background: red;
+            font-weight: bold;
         }
         
         .boom {
             background: yellow;
+            font-weight: bold;
         }
         
         .qcbang {
             /*color: #000;*/
-            background: repeating-linear-gradient(-45deg, red, red 25px, yellow 25px, yellow 50px);
+            background: repeating-linear-gradient(-45deg, red, red 30px, yellow 30px, yellow 60px);
+            font-weight: bold;
         }
         
         .hide {
@@ -53,10 +56,50 @@
             <label>Min: <input type="text" id="minValueWD" value="null"></label>
             <label>Max: <input type="text" id="maxValueWD" value="null"></label></br>
             <input type="button" value="Apply" id="applyRule" onclick=_applyRule()>
-            <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" id="exclusions"></label></br>
+            <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" onclick="_exclusions(this);"></label></br>
         </div>
         <div id="nettable-container"></div>
         <script type="text/javascript">
+            _exclusions = function (checkbox) {
+                    d3.selectAll("tr").selectAll("td").each(function (d) {
+                            d3.select(this.parentNode).classed('hide', function(d){
+                                if (d3.select(this).classed("bang") !== true){
+                                    return checkbox.checked;
+                                } else {
+                                    return !checkbox.checked;
+                            }
+                        })
+                    })
+                    // d3.selectAll("tr").each(function (d) {
+                    //         if (d3.select(this) === "bang") {
+                    //             return;
+                    //         } else {
+                    //             console.log("here")
+                    //             d3.select(this.parentNode).classed("hide", function () {
+                    //                 return checkbox.checked;
+                    //             })
+                    //         }
+                    //     })
+                        // d3.select(this.parentNode).classed('boom', true)})
+                        // d3.selectAll("tr")
+                        // d3.selectAll("tr").classed("hide", function () {
+                        //     if (d3.select(this).selectAll("td") === "bang") {
+                        //         return false;
+                        //     } else {
+                        //         // return checkbox.checked
+                        //         d3.select(this.parentNode).classed("hide", function () {
+                        //                 return checkbox.checked;
+                        //             })
+                        // d3.selectAll("td").classed("hide", function () {
+                        // console.log(d3.select(this).selectAll("td").classed("bang"))
+                        // if (d3.select(this.parentNode).selectAll("bang") !== true) {
+                        // if (d3.selectAll("tr").select("td").classed("bang") !== true || d3.selectAll("tr").select("td").classed("qcbang") !== true) {
+                        // return checkbox.checked
+                        // } else {
+                        // return false;
+                }
+                //     })
+                // }
             _applyRule = function () {
                 var minValueAT = document.getElementById('minValueAT').value;
                 var maxValueAT = document.getElementById('maxValueAT').value;
@@ -67,11 +110,12 @@
                 var minValueWD = document.getElementById('minValueWD').value;
                 var maxValueWD = document.getElementById('maxValueWD').value;
                 var current_url = window.location.href
-                var base_url = current_url.replace(/(&select=)\S+(\}\})/, "");
+                var base_url = current_url.replace(/(select=)\S+(\}\})/, "");
                 var new_url = (base_url + "?select={\"air_temp\":{\"min\":" + minValueAT +
                     ",\"max\":" + maxValueAT + "},\"relative_humidity\":{\"min\":" +
                     minValueRH + ",\"max\":" + maxValueRH + "},\"wind_speed\":{\"min\":" +
-                    minValueWS + ",\"max\":" + maxValueWS + "},\"wind_direction\":{\"min\":" + minValueWD +
+                    minValueWS + ",\"max\":" + maxValueWS + "},\"wind_direction\":{\"min\":" +
+                    minValueWD +
                     ",\"max\":" + maxValueWD + "}}");
                 window.location.href = new_url;
                 // var filterInterface = {
@@ -104,7 +148,8 @@
             // }
         </script>
 </body>
-<script src="assets/js/core/mesonet-current.min.js"></script>
+<!--<script src="assets/js/core/mesonet-current.min.js"></script>-->
+<script src="http://dev2.mesowest.net/tomato//assets/js/core/mesonet-current.js"></script>
 <script src="assets/js/core/sample_fire.js"></script>
 <script src="http://dev2.mesowest.net/tomato//assets/js/core/d3.v4.js"></script>
 <!--<script src="assets/js/core/d3.v4.min.js"></script>-->

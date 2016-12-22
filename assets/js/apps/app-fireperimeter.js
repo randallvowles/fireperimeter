@@ -125,7 +125,7 @@
                             // console.log(d);
                             if (typeof _s[i].QC[d + "_set_1"] !== "undefined") {
                                 // var _qcFlag = _s[i].QC
-                                console.log(_s[i].QC[d + "_set_1"])
+                                // console.log(_s[i].QC[d + "_set_1"])
                                 tmp[d] = [_d, _s[i].QC[d + "_set_1"]]
                             } else {
                                 tmp[d] = [_d]
@@ -285,6 +285,9 @@
                     return Number(d3.select(this).text()) < B ? true : false;
                 });
             } else if (A === null && B === null) {
+                // d3.selectAll("td").classed("hide", function(){
+                //     return true
+                // })
                 // return false;
                 continue;
             } else {
@@ -323,4 +326,11 @@
         })
     }
 
+    // function _exclusions(checkbox) {
+    //     d3.selectAll("tr").classed("hide", function () {
+    //         if (d3.select(this).classed("boom") !== true || d3.select(this).classed("bang") !== true || d3.select(this).classed("qcbang") !== true) {
+    //             return checkbox.checked ? true : false;
+    //         }
+    //     })
+    // }
 })();
