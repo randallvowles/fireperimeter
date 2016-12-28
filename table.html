@@ -20,68 +20,190 @@
         
         .bang {
             background: red;
+            font-weight: bold;
         }
         
         .boom {
             background: yellow;
+            font-weight: bold;
+        }
+        
+        .qcbang {
+            /*color: #000;*/
+            background: repeating-linear-gradient(-45deg, red, red 30px, yellow 30px, yellow 60px);
+            font-weight: bold;
+        }
+        
+        .hasBang {
+            /*font-weight: bold;*/
+        }
+        
+        .hide {
+            display: none;
         }
     </style>
 </head>
 
 <body>
-    <form>
-        <div id="input_form.php">
-            <label>Air Temperature - </label>
-            <label>Min: <input type="text" id="minValueAT" value="null"></label>
-            <label>Max: <input type="text" id="maxValueAT" value="null"></label></br>
-            <label>Relative Humidity - </label>
-            <label>Min: <input type="text" id="minValueRH" value="null"></label>
-            <label>Max: <input type="text" id="maxValueRH" value="null"></label></br>
-            <label>Wind Speed - </label>
-            <label>Min: <input type="text" id="minValueWS" value="null"></label>
-            <label>Max: <input type="text" id="maxValueWS" value="null"></label></br>
-            <label>Wind Direction - </label>
-            <label>Min: <input type="text" id="minValueWD" value="null"></label>
-            <label>Max: <input type="text" id="maxValueWD" value="null"></label></br>
-            <input type="button" value="Apply" onclick=_applyRule()>
-            <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" id="exclusions"></label></br>
-
-        </div>
-        <div id="nettable-container"></div>
-        <script type="text/javascript">
-            _applyRule = function () {
-                var minValueAT = document.getElementById('minValueAT').value;
-                var maxValueAT = document.getElementById('maxValueAT').value;
-                var minValueRH = document.getElementById('minValueRH').value;
-                var maxValueRH = document.getElementById('maxValueRH').value;
-                var minValueWS = document.getElementById('minValueWS').value;
-                var maxValueWS = document.getElementById('maxValueWS').value;
-                var minValueWD = document.getElementById('minValueWD').value;
-                var maxValueWD = document.getElementById('maxValueWD').value;
-                var current_url = window.location.href
-                var base_url = current_url.replace(/(&select=)\S+(\}\})/, "");
-                var new_url = (base_url + "&select={\"air_temp\":{\"min\":" + minValueAT +
-                    ",\"max\":" + maxValueAT + "},\"relative_humidity\":{\"min\":" +
-                    minValueRH + ",\"max\":" + maxValueRH + "},\"wind_speed\":{\"min\":" +
-                    minValueWS + ",\"max\":" + maxValueWS + "},\"wind_direction\":{\"min\":" + minValueWD +
-                    ",\"max\":" + maxValueWD + "}}");
-                window.location.href = new_url;
-            // _highlightCells(new_url);
-            };
-            // _excludeNonHighlightedCells = function (){
-            //     if (document.getElementById("exclusions").checked) {
-            //         // If clicked, hide all NOT "bang"
-            //         d3.selectAll("bang")
-            //     } else {
-            //         // If not clicked, show all stid's
-            //     }
-            // }
-        </script>
+    <div>
+        <article>
+            <h1>Weather Near Fires</h1>
+            </br>
+            <p>
+                To filter the results either enter the range for each parameter, enter the min field to create a greater-than parameter (leave
+                the max blank), or create a less-than parameter by entering the max (leave the min blank).
+        </article>
+    </div>
+    <div id="input_form.php">
+        <label>Air Temperature - </label>
+        <label>Min: <input type="text" id="minValueAT" value=null></label>
+        <label>Max: <input type="text" id="maxValueAT" value=null></label></br>
+        <label>Relative Humidity - </label>
+        <label>Min: <input type="text" id="minValueRH" value=null></label>
+        <label>Max: <input type="text" id="maxValueRH" value=null></label></br>
+        <label>Wind Speed - </label>
+        <label>Min: <input type="text" id="minValueWS" value=null></label>
+        <label>Max: <input type="text" id="maxValueWS" value=null></label></br>
+        <label>Wind Direction - </label>
+        <label>Min: <input type="text" id="minValueWD" value=null></label>
+        <label>Max: <input type="text" id="maxValueWD" value=null></label></br>
+        <input type="button" value="Apply" id="applyRule" onclick=_applyRule()>
+        <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" onclick="_exclusions(this);"></label></br>
+    </div>
+    <div id="nettable-container"></div>
 </body>
-<script src="assets/js/core/mesonet-current.min.js"></script>
+<script type="text/javascript">
+    function _exclusions(checkbox) {
+        d3.selectAll("th").each(function () {
+            d3.select(this.parentNode).classed("hasBang", true)
+        });
+        d3.selectAll("tr").selectAll(".bang").each(function (d) {
+            // console.log(d3.select(this.parentNode))
+            d3.select(this.parentNode).classed('hasBang', true)
+        })
+        d3.selectAll("tr").classed("hide", function (d) {
+            if (d3.select(this).classed("hasBang") === true) {
+                return false
+            } else {
+                return checkbox.checked;
+            }
+        })
+    }
+
+
+    function _applyRule() {
+        var minValueAT = Number(document.getElementById('minValueAT').value);
+        var maxValueAT = Number(document.getElementById('maxValueAT').value);
+        var minValueRH = Number(document.getElementById('minValueRH').value);
+        var maxValueRH = Number(document.getElementById('maxValueRH').value);
+        var minValueWS = Number(document.getElementById('minValueWS').value);
+        var maxValueWS = Number(document.getElementById('maxValueWS').value);
+        var minValueWD = Number(document.getElementById('minValueWD').value);
+        var maxValueWD = Number(document.getElementById('maxValueWD').value);
+        var current_url = window.location.href
+        var base_url = current_url.replace(/(\?select=)\S+(\}\})/, "");
+        // var new_url = (base_url + "?select={\"air_temp\":{\"min\":" + minValueAT +
+        //     ",\"max\":" + maxValueAT + "},\"relative_humidity\":{\"min\":" +
+        //     minValueRH + ",\"max\":" + maxValueRH + "},\"wind_speed\":{\"min\":" +
+        //     minValueWS + ",\"max\":" + maxValueWS + "},\"wind_direction\":{\"min\":" +
+        //     minValueWD +
+        //     ",\"max\":" + maxValueWD + "}}");
+        // window.location.href = new_url;
+        var filterInterface = {
+            "air_temp": {
+                "min": minValueAT,
+                "max": maxValueAT
+            },
+            "relative_humidity": {
+                "min": minValueRH,
+                "max": maxValueRH
+            },
+            "wind_speed": {
+                "min": minValueWS,
+                "max": maxValueWS
+            },
+            "wind_direction": {
+                "min": minValueWD,
+                "max": maxValueWD
+            }
+        };
+        // var newURL = base_url + "?select=" + JSON.stringify(filterInterface);
+        var newURL = "?select=" + JSON.stringify(filterInterface);
+        // window.location.href = newURL;
+        _highlightCells(newURL)
+            // };
+
+
+        /**
+         * Highlights Cells based on user-defined parameters
+         * @param {object} Selector, Min, Max
+         */
+        function _highlightCells(object) {
+            //     object in the form:
+            //     {selector: {"min": A, max": B}}
+            var i = 0;
+            // var li = Object.keys(filter).length
+            // console.log(filterInterface)
+            var filter = (filterInterface);
+
+            var key;
+
+            // while (i < li) {
+            for (key in Object.keys(filter)) {
+                var selector = (Object.keys(filter))[key];
+                // console.log("Variable selected = " + selector);
+                // assign min/max values, test for null
+                var A = typeof filter[selector].min === "undefined" || isNaN(filter[selector].min) !== false ? null : filter[selector].min;
+                var B = typeof filter[selector].max === "undefined" || isNaN(filter[selector].max) !== false ? null : filter[selector].max;
+                // console.log("Min = " + A);
+                // console.log("Max = " + B);
+                if (typeof selector === "undefined") {
+                    return false;
+                    // console.log("here! 1")
+                };
+                // if (typeof A !== "undefined" || A !== null && typeof B !== "undefined" || B !== null) {
+                if (A !== null && B !== null) {
+                    // console.log("here! 2")
+                    // range code, given a min and a max
+                    d3.selectAll('.' + selector).classed("bang", function () {
+                        return Number(d3.select(this).text()) > A &&
+                            Number(d3.select(this).text()) < B ? true : false;
+                    });
+                    // } else if (typeof A !== "undefined" || A !== null && typeof B === "undefined" || B === null) {
+                } else if (A !== null && B === null) {
+                    // console.log("here! 3")
+                    // greater-than code, min but no max
+                    d3.selectAll('.' + selector).classed("bang", function () {
+                        return Number(d3.select(this).text()) > A ? true : false;
+                    });
+                    // } else if (typeof A === "undefined" || A === null && typeof B !== "undefined" || B !== null) {
+                } else if (A === null && B !== null) {
+                    // console.log("here! 4")
+                    // less-than code, max but no min
+                    d3.selectAll('.' + selector).classed("bang", function () {
+                        return Number(d3.select(this).text()) < B ? true : false;
+                    });
+                } else if (A === null && B === null) {
+                    // console.log("here! 5")
+                    // d3.selectAll("td").classed("hide", function(){
+                    //     return true
+                    // })
+                    // return false;
+                    continue;
+                } else {
+                    console.log("Bang! Bang! Something went terribly wrong!")
+                };
+                // i++;
+            };
+        };
+    };
+</script>
+<!--<script src="assets/js/core/mesonet-current.min.js"></script>-->
+<script src="http://dev2.mesowest.net/tomato//assets/js/core/mesonet-current.js"></script>
 <script src="assets/js/core/sample_fire.js"></script>
 <script src="http://dev2.mesowest.net/tomato//assets/js/core/d3.v4.js"></script>
 <!--<script src="assets/js/core/d3.v4.min.js"></script>-->
 <script src="assets/js/apps/app-fireperimeter.js"></script>
+<script src="http://dev2.mesowest.net/tomato//assets/js/core/units.js"></script>
 
 </html>

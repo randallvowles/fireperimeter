@@ -14,6 +14,8 @@
     apiArgs.vars = rankedSensors.join(",");
     apiArgs.units = "english";
     apiArgs.qc = "all";
+    apiArgs.recent = "61"
+    apiArgs.timeformat = "%s"
 
     var tableArgs = {
         table_container: "#nettable-container",
@@ -21,7 +23,7 @@
         table_class: "",
         sensors: rankedSensors
     };
-    var headerNames = ["STID", "Distance From Perimeter (miles)", "Bearing From Perimeter (degrees)",
+    var headerNames = ["Station ID (STID)", "Distance From Fire Perimeter (miles)", "Bearing From Fire Perimeter (degrees)",
         "Time From Observation (minutes)", "Air Temperature (deg F)", "Relative Humidity (%)",
         "Wind Speed (mph)", "Wind Direction (degrees)", "Weather Condition"
     ];
@@ -38,13 +40,18 @@
     M.fetch({
         api_args: apiArgs
     });
-    var filter = JSON.parse(M.windowArgs().select)
+    var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
 
     M.printResponse();
     $.when(M.async()).done(function () {
         _networkTableEmitter(M, tableArgs);
         _highlightCells(filter);
         _highlightQC(M.response);
+        // d3.select("applyRule").on("click", function () {
+        //     _highlightCells(filter);
+        // })
+
+
     });
     return
 
@@ -57,6 +64,8 @@
 
         var _r = M.response;
         var _s = _r.station;
+        var U = new Units();
+
         var rankedSensors = args.sensors;
         var baseURL = ["http://mesowest.utah.edu/cgi-bin/droman/meso_base_dyn.cgi?stn="]
             // Insert the `date_time` value into `rankedSensors`, we do this to make sure 
@@ -92,28 +101,45 @@
             var tmp = {};
             tmp.stid = _s[i].STID;
             rankedSensors.map(function (d) {
-                // console.log(i)
-                // console.log(stidAndDist[i][0])
-                // Best to use terinary logic here, but for simplicity...
-                if (d === "dfp") {
-                    tmp[d] = (stidAndDist[i][0]).toFixed(2);
-                } else if (d === "bfp") {
-                    tmp[d] = (stidAndDist[i][1]).toFixed(0);
-                } else if (d === "weather_condition") {
-                    try {
-                        tmp[d] = _s[i].OBSERVATIONS["weather_condition_set_1d"][last]
-                    } catch (e) {
-                        tmp[d] = null;
-                    }
-                } else if (typeof _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"] === "undefined") {
-                    tmp[d] = null;
-                } else {
-                    tmp[d] = _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last]
-                }
-            })
+                    // console.log(i)
+                    // console.log(stidAndDist[i][0])
+                    // Best to use terinary logic here, but for simplicity...
+                    if (d === "dfp") {
+                        tmp[d] = [stidAndDist[i][0]];
+                    } else if (d === "bfp") {
+                        tmp[d] = [stidAndDist[i][1]];
+                    } else if (d === "weather_condition") {
+                        try {
+                            tmp[d] = [_s[i].OBSERVATIONS["weather_condition_set_1d"][last]]
+                        } catch (e) {
+                            tmp[d] = [null];
+                        }
+                    } else if (typeof _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"] === "undefined") {
+                        tmp[d] = [null];
+                    } else if (_s[i]["QC_FLAGGED"] == true && d !== "date_time") {
+                        // console.log(_s[i])
+                        var _d = _s[i].OBSERVATIONS[d + "_set_1"][last]
+                            // var j = 0;
+                        for (var j in _s[i].QC) {
+                            // console.log(_s[i].QC);
+                            // console.log(d);
+                            if (typeof _s[i].QC[d + "_set_1"] !== "undefined") {
+                                // var _qcFlag = _s[i].QC
+                                // console.log(_s[i].QC[d + "_set_1"])
+                                tmp[d] = [_d, _s[i].QC[d + "_set_1"]]
+                            } else {
+                                tmp[d] = [_d]
+                            }
+                        }
 
-            // Append to our new `stations` array            
+                    } else {
+                        tmp[d] = [_s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last]]
+                    }
+                })
+                // Append to our new `stations` array
             stations.push(tmp);
+            tmp = []
+                // console.log(stations)
             i++;
         }
 
@@ -186,16 +212,34 @@
             })
             .enter().append("td")
             .text(function (d) {
-                return d.value
+                var _v = (d.name).split("_set_");
+                _v = typeof d.value === "undefined" ? "" : typeof d.value === "object" ?
+                    d.value[0] : d.value;
+                _v = typeof _v === "boolean" ? "" : _v;
+                var _p = typeof _r.sensor.units[0][d.name.split("_set_")[0]] === "undefined" ?
+                    2 : U.get(_r.sensor.units[0][d.name.split("_set_")[0]]).precision;
+                return d.name === "date_time" ?
+                    d.value : typeof _v === "number" ? Number(_v).toFixed(_p) : _v;
+                // return d.value;
             })
             .attr("class", function (d) {
                 return (d.name)
+            })
+            // add bang/qcbang attr call here
+            .attr("classed", function () {
+
             })
 
         var hyperlink = d3.selectAll(".stid")
             .on("click", function () {
                 window.open(baseURL + d3.select(this).text());
             });
+        var timeConversion = d3.selectAll(".date_time")
+            .text(function (d) {
+                var timeNow = String(Date.now()).slice(0, -3);
+                return ((timeNow - d.value) / 60).toFixed(0);
+            })
+        var disableSorting = d3.selectAll(".weather_condition").property("sorted", false).on("click", false);
     }
 
 
@@ -209,6 +253,7 @@
         var i = 0;
         var li = Object.keys(filter).length
         var key;
+
         // while (i < li) {
         for (key in Object.keys(filter)) {
             var selector = (Object.keys(filter))[key];
@@ -216,8 +261,10 @@
             // assign min/max values, test for null
             var A = typeof filter[selector].min === "undefined" ? null : filter[selector].min;
             var B = typeof filter[selector].max === "undefined" ? null : filter[selector].max;
-            console.log("Min = " + A)
-            console.log("Max = " + B);
+            // var A = typeof filter[selector].min === "undefined" || filter[selector].min === "NaN" ? null : filter[selector].min;
+            // var B = typeof filter[selector].max === "undefined" || filter[selector].max === "NaN" ? null : filter[selector].max;
+            // console.log("Min = " + A);
+            // console.log("Max = " + B);
             if (typeof selector === "undefined") {
                 return false;
             };
@@ -241,10 +288,13 @@
                     return Number(d3.select(this).text()) < B ? true : false;
                 });
             } else if (A === null && B === null) {
+                // d3.selectAll("td").classed("hide", function(){
+                //     return true
+                // })
                 // return false;
                 continue;
             } else {
-                console.log("Bang! Bang! Something went terribly wrong!!!!!")
+                console.log("Bang! Bang! Something went terribly wrong!")
             };
             // i++;
         };
@@ -255,21 +305,35 @@
      * @param {object} API response
      */
     function _highlightQC(object) {
-        var _r = M.response;
-        var _s = _r.station;
-        var qcFlagged = [];
-        var i;
-        for (i in _s) {
-            if (_s[i]["QC_FLAGGED"] == true) {
-                qcFlagged.push(_s[i]["STID"]);
+        // var _r = M.response;
+        // var _s = _r.station;
+        // var qcFlagged = [];
+        // var i;
+        // for (i in _s) {
+        //     if (_s[i]["QC_FLAGGED"] == true) {
+        //         qcFlagged.push(_s[i]["STID"]);
+
+        //     } else {
+        //         continue;
+        //     }
+        // }
+        d3.selectAll("td").classed("boom", function (d) {
+            return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
+        })
+        d3.selectAll("td").classed("qcbang", function (d) {
+            if (d3.select(this).classed("boom") === true && d3.select(this).classed("bang") === true) {
+                return true
             } else {
-                continue;
+                return false
             }
-        }
-        console.log("Stations with QC Flags: " + qcFlagged);
-        d3.selectAll(".stid").classed("boom", function () {
-            return (qcFlagged.includes(d3.select(this).text())) == true ? true : false;
         })
     }
 
+    // function _exclusions(checkbox) {
+    //     d3.selectAll("tr").classed("hide", function () {
+    //         if (d3.select(this).classed("boom") !== true || d3.select(this).classed("bang") !== true || d3.select(this).classed("qcbang") !== true) {
+    //             return checkbox.checked ? true : false;
+    //         }
+    //     })
+    // }
 })();
