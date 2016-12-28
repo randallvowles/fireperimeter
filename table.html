@@ -56,17 +56,17 @@
     </div>
     <div id="input_form.php">
         <label>Air Temperature - </label>
-        <label>Min: <input type="text" id="minValueAT" value="null"></label>
-        <label>Max: <input type="text" id="maxValueAT" value="null"></label></br>
+        <label>Min: <input type="text" id="minValueAT" value=null></label>
+        <label>Max: <input type="text" id="maxValueAT" value=null></label></br>
         <label>Relative Humidity - </label>
-        <label>Min: <input type="text" id="minValueRH" value="null"></label>
-        <label>Max: <input type="text" id="maxValueRH" value="null"></label></br>
+        <label>Min: <input type="text" id="minValueRH" value=null></label>
+        <label>Max: <input type="text" id="maxValueRH" value=null></label></br>
         <label>Wind Speed - </label>
-        <label>Min: <input type="text" id="minValueWS" value="null"></label>
-        <label>Max: <input type="text" id="maxValueWS" value="null"></label></br>
+        <label>Min: <input type="text" id="minValueWS" value=null></label>
+        <label>Max: <input type="text" id="maxValueWS" value=null></label></br>
         <label>Wind Direction - </label>
-        <label>Min: <input type="text" id="minValueWD" value="null"></label>
-        <label>Max: <input type="text" id="maxValueWD" value="null"></label></br>
+        <label>Min: <input type="text" id="minValueWD" value=null></label>
+        <label>Max: <input type="text" id="maxValueWD" value=null></label></br>
         <input type="button" value="Apply" id="applyRule" onclick=_applyRule()>
         <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" onclick="_exclusions(this);"></label></br>
     </div>
@@ -128,68 +128,73 @@
             }
         };
         // var newURL = base_url + "?select=" + JSON.stringify(filterInterface);
-        var newURL = JSON.stringify(filterInterface);
+        var newURL = "?select=" + JSON.stringify(filterInterface);
         // window.location.href = newURL;
         _highlightCells(newURL)
-    };
+            // };
 
 
-    /**
-     * Highlights Cells based on user-defined parameters
-     * @param {object} Selector, Min, Max
-     */
-    function _highlightCells(object) {
-        //     object in the form:
-        //     {selector: {"min": A, max": B}}
-        var i = 0;
-        // var li = Object.keys(filter).length
-        console.log(filterInterface)
-        var filter = JSON.parse(filterInterface);
+        /**
+         * Highlights Cells based on user-defined parameters
+         * @param {object} Selector, Min, Max
+         */
+        function _highlightCells(object) {
+            //     object in the form:
+            //     {selector: {"min": A, max": B}}
+            var i = 0;
+            // var li = Object.keys(filter).length
+            // console.log(filterInterface)
+            var filter = (filterInterface);
 
-        var key;
+            var key;
 
-        // while (i < li) {
-        for (key in Object.keys(filter)) {
-            var selector = (Object.keys(filter))[key];
-            console.log("Variable selected = " + selector);
-            // assign min/max values, test for null
-            var A = typeof filter[selector].min === "undefined" ? null : filter[selector].min;
-            var B = typeof filter[selector].max === "undefined" ? null : filter[selector].max;
-            // console.log("Min = " + A);
-            // console.log("Max = " + B);
-            if (typeof selector === "undefined") {
-                return false;
-                console.log("here!")
+            // while (i < li) {
+            for (key in Object.keys(filter)) {
+                var selector = (Object.keys(filter))[key];
+                // console.log("Variable selected = " + selector);
+                // assign min/max values, test for null
+                var A = typeof filter[selector].min === "undefined" || isNaN(filter[selector].min) !== false ? null : filter[selector].min;
+                var B = typeof filter[selector].max === "undefined" || isNaN(filter[selector].max) !== false ? null : filter[selector].max;
+                // console.log("Min = " + A);
+                // console.log("Max = " + B);
+                if (typeof selector === "undefined") {
+                    return false;
+                    // console.log("here! 1")
+                };
+                // if (typeof A !== "undefined" || A !== null && typeof B !== "undefined" || B !== null) {
+                if (A !== null && B !== null) {
+                    // console.log("here! 2")
+                    // range code, given a min and a max
+                    d3.selectAll('.' + selector).classed("bang", function () {
+                        return Number(d3.select(this).text()) > A &&
+                            Number(d3.select(this).text()) < B ? true : false;
+                    });
+                    // } else if (typeof A !== "undefined" || A !== null && typeof B === "undefined" || B === null) {
+                } else if (A !== null && B === null) {
+                    // console.log("here! 3")
+                    // greater-than code, min but no max
+                    d3.selectAll('.' + selector).classed("bang", function () {
+                        return Number(d3.select(this).text()) > A ? true : false;
+                    });
+                    // } else if (typeof A === "undefined" || A === null && typeof B !== "undefined" || B !== null) {
+                } else if (A === null && B !== null) {
+                    // console.log("here! 4")
+                    // less-than code, max but no min
+                    d3.selectAll('.' + selector).classed("bang", function () {
+                        return Number(d3.select(this).text()) < B ? true : false;
+                    });
+                } else if (A === null && B === null) {
+                    // console.log("here! 5")
+                    // d3.selectAll("td").classed("hide", function(){
+                    //     return true
+                    // })
+                    // return false;
+                    continue;
+                } else {
+                    console.log("Bang! Bang! Something went terribly wrong!")
+                };
+                // i++;
             };
-            // if (typeof A !== "undefined" || A !== null && typeof B !== "undefined" || B !== null) {
-            if (A !== null && B !== null) {
-                // range code, given a min and a max
-                d3.selectAll(selector).classed("bang", function () {
-                    return Number(d3.select(this).text()) > A &&
-                        Number(d3.select(this).text()) < B ? true : false;
-                });
-                // } else if (typeof A !== "undefined" || A !== null && typeof B === "undefined" || B === null) {
-            } else if (A !== null && B === null) {
-                // greater-than code, min but no max
-                d3.selectAll(selector).classed("bang", function () {
-                    return Number(d3.select(this).text()) > A ? true : false;
-                });
-                // } else if (typeof A === "undefined" || A === null && typeof B !== "undefined" || B !== null) {
-            } else if (A === null && B !== null) {
-                // less-than code, max but no min
-                d3.selectAll(selector).classed("bang", function () {
-                    return Number(d3.select(this).text()) < B ? true : false;
-                });
-            } else if (A === null && B === null) {
-                // d3.selectAll("td").classed("hide", function(){
-                //     return true
-                // })
-                // return false;
-                continue;
-            } else {
-                console.log("Bang! Bang! Something went terribly wrong!")
-            };
-            // i++;
         };
     };
 </script>

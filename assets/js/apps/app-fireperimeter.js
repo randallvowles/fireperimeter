@@ -261,6 +261,8 @@
             // assign min/max values, test for null
             var A = typeof filter[selector].min === "undefined" ? null : filter[selector].min;
             var B = typeof filter[selector].max === "undefined" ? null : filter[selector].max;
+            // var A = typeof filter[selector].min === "undefined" || filter[selector].min === "NaN" ? null : filter[selector].min;
+            // var B = typeof filter[selector].max === "undefined" || filter[selector].max === "NaN" ? null : filter[selector].max;
             // console.log("Min = " + A);
             // console.log("Max = " + B);
             if (typeof selector === "undefined") {
