@@ -239,6 +239,7 @@
                 var timeNow = String(Date.now()).slice(0, -3);
                 return ((timeNow - d.value) / 60).toFixed(0);
             })
+        var disableSorting = d3.selectAll(".weather_condition").property("sorted", false).on("click", false);
     }
 
 
@@ -260,8 +261,8 @@
             // assign min/max values, test for null
             var A = typeof filter[selector].min === "undefined" ? null : filter[selector].min;
             var B = typeof filter[selector].max === "undefined" ? null : filter[selector].max;
-            console.log("Min = " + A);
-            console.log("Max = " + B);
+            // console.log("Min = " + A);
+            // console.log("Max = " + B);
             if (typeof selector === "undefined") {
                 return false;
             };
