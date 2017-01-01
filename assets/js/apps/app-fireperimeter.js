@@ -10,12 +10,15 @@
     var apiArgs = M.windowArgs();
 
     // Force a set of variables
-    var rankedSensors = ["air_temp", "relative_humidity", "wind_speed", "wind_direction", "weather_condition"]
+    var rankedSensors = ["air_temp", "relative_humidity", "wind_speed", "wind_gust", "wind_direction", "weather_condition"]
     apiArgs.vars = rankedSensors.join(",");
     apiArgs.units = "english";
     apiArgs.qc = "all";
-    apiArgs.recent = "61"
-    apiArgs.timeformat = "%s"
+    // apiArgs.recent = "61";
+    apiArgs.timeformat = "%s";
+    // Forced time for presentation purposes
+    apiArgs.start = "201611290000";
+    apiArgs.end = "201611290130";
 
     var tableArgs = {
         table_container: "#nettable-container",
@@ -25,14 +28,14 @@
     };
     var headerNames = ["Station ID (STID)", "Distance From Fire Perimeter (miles)", "Bearing From Fire Perimeter (degrees)",
         "Time From Observation (minutes)", "Air Temperature (deg F)", "Relative Humidity (%)",
-        "Wind Speed (mph)", "Wind Direction (degrees)", "Weather Condition"
+        "Wind Speed (mph)", "Wind Gust (mph)", "Wind Direction (degrees)", "Weather Condition"
     ];
     var stidStack = [];
     var stidAndDist = [];
     var key;
-    for (key in sample_fire.nearest_stations) {
-        stidStack.push(sample_fire.nearest_stations[key]["STID"]);
-        stidAndDist.push(sample_fire.nearest_stations[key]["DFP"]);
+    for (key in chimney_top.nearest_stations) {
+        stidStack.push(chimney_top.nearest_stations[key]["STID"]);
+        stidAndDist.push(chimney_top.nearest_stations[key]["DFP"]);
     };
 
     var stidList = stidStack.join(",");
@@ -236,9 +239,11 @@
             });
         var timeConversion = d3.selectAll(".date_time")
             .text(function (d) {
-                var timeNow = String(Date.now()).slice(0, -3);
+                // var timeNow = String(Date.now()).slice(0, -3);
+                var timeNow = String(Date.parse("Nov 29, 2016 02:01:00 UTC")).slice(0, -3);
                 return ((timeNow - d.value) / 60).toFixed(0);
             })
+            // 1480384800
         var disableSorting = d3.selectAll(".weather_condition").property("sorted", false).on("click", false);
     }
 

@@ -29,8 +29,7 @@
         }
         
         .qcbang {
-            /*color: #000;*/
-            background: repeating-linear-gradient(-45deg, red, red 30px, yellow 30px, yellow 60px);
+            background: repeating-linear-gradient(-65deg, red, red 40px, yellow 40px, yellow 60px);
             font-weight: bold;
         }
         
@@ -40,13 +39,6 @@
         
         .hide {
             display: none;
-        }
-        
-        body {
-            margin-bottom: 10px;
-            margin-top: 10px;
-            margin-left: 10px;
-            margin-right: 10px;
         }
     </style>
 </head>
@@ -58,7 +50,9 @@
             </br>
             <p>
                 To filter the results either enter the range for each parameter, enter the min field to create a greater-than parameter (leave
-                the max blank), or create a less-than parameter by entering the max (leave the min blank).
+                the max blank), or create a less-than parameter by entering the max (leave the min blank). Clicking on the
+                Station ID will take you to the MesoWest page for that station, where you can access graphics, timeseries
+                data from all sensors, and additional metadata.
         </article>
     </div>
     <div id="input_form.php">
@@ -148,6 +142,7 @@
             //     {selector: {"min": A, max": B}}
             var i = 0;
             // var li = Object.keys(filter).length
+            console.log(filterInterface)
             var filter = (filterInterface);
             var key;
             for (key in Object.keys(filter)) {
@@ -189,14 +184,24 @@
                 };
             };
         };
+        d3.selectAll("td").classed("boom", function (d) {
+            return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
+        })
+        d3.selectAll("td").classed("qcbang", function (d) {
+            if (d3.select(this).classed("boom") === true && d3.select(this).classed("bang") === true) {
+                return true
+            } else {
+                return false
+            }
+        })
     };
 </script>
 <!--<script src="assets/js/core/mesonet-current.min.js"></script>-->
 <script src="http://dev2.mesowest.net/tomato//assets/js/core/mesonet-current.js"></script>
-<script src="assets/js/core/sample_fire.js"></script>
+<script src="assets/js/core/chimney_top.js"></script>
 <script src="http://dev2.mesowest.net/tomato//assets/js/core/d3.v4.js"></script>
 <!--<script src="assets/js/core/d3.v4.min.js"></script>-->
 <script src="assets/js/apps/app-fireperimeter.js"></script>
-<script src="http://dev2.mesowest.net/tomato//assets/js/core/units.js"></script>
+<script src="http://dev2.mesowest.net/tomato//assets/js/core/core.units.js"></script>
 
 </html>
