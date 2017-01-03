@@ -29,7 +29,7 @@
         }
         
         .qcbang {
-            background: repeating-linear-gradient(-65deg, red, red 40px, yellow 40px, yellow 60px);
+            background: repeating-linear-gradient(-65deg, red, red 45px, yellow 45px, yellow 65px);
             font-weight: bold;
         }
         
@@ -65,6 +65,9 @@
         <label>Wind Speed - </label>
         <label>Min: <input type="text" maxlength=3 id="minValueWS"></label>
         <label>Max: <input type="text" maxlength=3 id="maxValueWS"></label></br>
+        <label>Wind Gust - </label>
+        <label>Min: <input type="text" maxlength=3 id="minValueWG"></label>
+        <label>Max: <input type="text" maxlength=3 id="maxValueWG"></label></br>
         <label>Wind Direction - </label>
         <label>Min: <input type="text" maxlength=3 id="minValueWD"></label>
         <label>Max: <input type="text" maxlength=3 id="maxValueWD"></label></br>
@@ -97,7 +100,9 @@
         var minValueRH = Number(document.getElementById('minValueRH').value);
         var maxValueRH = Number(document.getElementById('maxValueRH').value);
         var minValueWS = Number(document.getElementById('minValueWS').value);
-        var maxValueWS = Number(document.getElementById('maxValueWS').value);
+        var maxValueWS = Number(document.getElementById('maxValueWG').value);
+        var minValueWG = Number(document.getElementById('minValueWG').value);
+        var maxValueWG = Number(document.getElementById('maxValueWS').value);
         var minValueWD = Number(document.getElementById('minValueWD').value);
         var maxValueWD = Number(document.getElementById('maxValueWD').value);
         var current_url = window.location.href
@@ -121,6 +126,10 @@
             "wind_speed": {
                 "min": minValueWS,
                 "max": maxValueWS
+            },
+            "wind_gust": {
+                "min": minValueWG,
+                "max": maxValueWG
             },
             "wind_direction": {
                 "min": minValueWD,
