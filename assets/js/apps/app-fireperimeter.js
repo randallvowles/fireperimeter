@@ -33,9 +33,9 @@
     var stidStack = [];
     var stidAndDist = [];
     var key;
-    for (key in chimney_top.nearest_stations) {
-        stidStack.push(chimney_top.nearest_stations[key]["STID"]);
-        stidAndDist.push(chimney_top.nearest_stations[key]["DFP"]);
+    for (key in chimney_top50.nearest_stations) {
+        stidStack.push(chimney_top50.nearest_stations[key]["STID"]);
+        stidAndDist.push(chimney_top50.nearest_stations[key]["DFP"]);
     };
 
     var stidList = stidStack.join(",");
@@ -198,7 +198,8 @@
             .append("i").attr("class", "sort-icon fa")
             .classed("fa-chevron-circle-down", function (d) {
                 return d === "dfp" ? true : false;
-            });
+            })
+
 
         // Create the rows
         var rows = table.append("tbody").attr("class", "scrollable")
@@ -228,10 +229,16 @@
             .attr("class", function (d) {
                 return (d.name)
             })
-            // add bang/qcbang attr call here
-            .attr("classed", function () {
+            .on("mouseover", function (d) {
+                // Call Bootstrap tooltip, this is one of the few jQuery dependencies
+                $(this).tooltip({
+                    "title": "Tooltip text or function call",
+                    "placement": "right",
+                    "html": true,
+                    "container": "body"
+                }).tooltip("show");
+            });
 
-            })
 
         var hyperlink = d3.selectAll(".stid")
             .on("click", function () {
@@ -240,7 +247,7 @@
         var timeConversion = d3.selectAll(".date_time")
             .text(function (d) {
                 // var timeNow = String(Date.now()).slice(0, -3);
-                var timeNow = String(Date.parse("Nov 29, 2016 02:01:00 UTC")).slice(0, -3);
+                var timeNow = String(Date.parse("Nov 29, 2016 01:35:00 UTC")).slice(0, -3);
                 return ((timeNow - d.value) / 60).toFixed(0);
             })
             // 1480384800

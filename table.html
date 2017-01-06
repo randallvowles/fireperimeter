@@ -53,6 +53,8 @@
                 the max blank), or create a less-than parameter by entering the max (leave the min blank). Clicking on the
                 Station ID will take you to the MesoWest page for that station, where you can access graphics, timeseries
                 data from all sensors, and additional metadata.
+            </p>
+            <h3>Current time: Nov 29 2016 01:35:00 UTC</h3>
         </article>
     </div>
     <div id="input_form.php">
@@ -153,6 +155,9 @@
             // var li = Object.keys(filter).length
             console.log(filterInterface)
             var filter = (filterInterface);
+            d3.selectAll("td").classed("bang", function () {
+                return false
+            });
             var key;
             for (key in Object.keys(filter)) {
                 var selector = (Object.keys(filter))[key];
@@ -164,6 +169,7 @@
                     selector].max;
                 console.log("Min = " + A);
                 console.log("Max = " + B);
+
                 if (typeof selector === "undefined") {
                     return false;
                 };
@@ -207,7 +213,7 @@
 </script>
 <!--<script src="assets/js/core/mesonet-current.min.js"></script>-->
 <script src="http://dev2.mesowest.net/tomato//assets/js/core/mesonet-current.js"></script>
-<script src="assets/js/core/chimney_top.js"></script>
+<script src="assets/js/core/chimney_top50.js"></script>
 <script src="http://dev2.mesowest.net/tomato//assets/js/core/d3.v4.js"></script>
 <!--<script src="assets/js/core/d3.v4.min.js"></script>-->
 <script src="assets/js/apps/app-fireperimeter.js"></script>

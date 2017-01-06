@@ -1,5 +1,4 @@
 var chimney_top = {
-
         "desc": {
             "Acres": "17107",
             "Agency": "NPS",
