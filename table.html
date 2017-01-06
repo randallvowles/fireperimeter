@@ -29,8 +29,7 @@
         }
         
         .qcbang {
-            /*color: #000;*/
-            background: repeating-linear-gradient(-45deg, red, red 30px, yellow 30px, yellow 60px);
+            background: repeating-linear-gradient(-65deg, red, red 45px, yellow 45px, yellow 65px);
             font-weight: bold;
         }
         
@@ -42,42 +41,59 @@
             display: none;
         }
         
-        body {
-            margin-bottom: 10px;
-            margin-top: 10px;
-            margin-left: 10px;
-            margin-right: 10px;
+        .qc-tooltip {
+            list-style: none;
+            margin-left: -1em;
         }
     </style>
 </head>
 
 <body>
-    <div>
-        <article>
-            <h1>Weather Near Fires</h1>
-            </br>
-            <p>
-                To filter the results either enter the range for each parameter, enter the min field to create a greater-than parameter (leave
-                the max blank), or create a less-than parameter by entering the max (leave the min blank).
-        </article>
-    </div>
-    <div id="input_form.php">
-        <label>Air Temperature - </label>
-        <label>Min: <input type="text" maxlength=3 id="minValueAT"></label>
-        <label>Max: <input type="text" maxlength=3 id="maxValueAT"></label></br>
-        <label>Relative Humidity - </label>
-        <label>Min: <input type="text" maxlength=3 id="minValueRH" ></label>
-        <label>Max: <input type="text" maxlength=3 id="maxValueRH"></label></br>
-        <label>Wind Speed - </label>
-        <label>Min: <input type="text" maxlength=3 id="minValueWS"></label>
-        <label>Max: <input type="text" maxlength=3 id="maxValueWS"></label></br>
-        <label>Wind Direction - </label>
+    <container>
+        <div class="row">
+            <div class="col-sm-12">
+                <article>
+                    <p class="lead">
+                        <h1>Monitoring Weather Conditions Near Wildfires</h1>
+                    </p>
+                    </br>
+                    <p>
+                        To filter the results either enter the range for each parameter, enter the min field to create a greater-than parameter (leave
+                        the max blank), or create a less-than parameter by entering the max (leave the min blank). Clicking
+                        on the Station ID will take you to the MesoWest page for that station, where you can access graphics,
+                        timeseries data from all sensors, and additional metadata. Cells highlighted yellow indicate a QC
+                        flag associated with that observation, hover over the cell for the QC flag description. 
+                    </p>
+                    <h4>Current time: Nov 29 2016 01:35:00 UTC</h4>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-3">
+                <label>Air Temperature - </label></br>
+                <label>Min: <input type="text" maxlength=3 id="minValueAT"></label></br>
+                <label>Max: <input type="text" maxlength=3 id="maxValueAT"></label></br>
+                <label>Relative Humidity - </label></br>
+                <label>Min: <input type="text" maxlength=3 id="minValueRH" ></label></br>
+                <label>Max: <input type="text" maxlength=3 id="maxValueRH"></label></br>
+                <label>Wind Speed - </label></br>
+                <label>Min: <input type="text" maxlength=3 id="minValueWS"></label></br>
+                <label>Max: <input type="text" maxlength=3 id="maxValueWS"></label></br>
+                <label>Wind Gust - </label></br>
+                <label>Min: <input type="text" maxlength=3 id="minValueWG"></label></br>
+                <label>Max: <input type="text" maxlength=3 id="maxValueWG"></label></br>
+                <!--<label>Wind Direction - </label>
         <label>Min: <input type="text" maxlength=3 id="minValueWD"></label>
-        <label>Max: <input type="text" maxlength=3 id="maxValueWD"></label></br>
-        <input type="button" value="Apply" id="applyRule" onclick=_applyRule()>
-        <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" onclick="_exclusions(this);"></label></br>
-    </div>
-    <div id="nettable-container"></div>
+        <label>Max: <input type="text" maxlength=3 id="maxValueWD"></label></br>-->
+                <input type="button" value="Apply" id="applyRule" onclick=_applyRule()>
+                <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" onclick="_exclusions(this);"></label></br>
+            </div>
+            <div class="col-sm-12 col-md-9">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <div id="nettable-container"></div>
+                </div>
+            </div>
 </body>
 <script type="text/javascript">
     function _exclusions(checkbox) {
@@ -103,9 +119,11 @@
         var minValueRH = Number(document.getElementById('minValueRH').value);
         var maxValueRH = Number(document.getElementById('maxValueRH').value);
         var minValueWS = Number(document.getElementById('minValueWS').value);
-        var maxValueWS = Number(document.getElementById('maxValueWS').value);
-        var minValueWD = Number(document.getElementById('minValueWD').value);
-        var maxValueWD = Number(document.getElementById('maxValueWD').value);
+        var maxValueWS = Number(document.getElementById('maxValueWG').value);
+        var minValueWG = Number(document.getElementById('minValueWG').value);
+        var maxValueWG = Number(document.getElementById('maxValueWS').value);
+        // var minValueWD = Number(document.getElementById('minValueWD').value);
+        // var maxValueWD = Number(document.getElementById('maxValueWD').value);
         var current_url = window.location.href
         var base_url = current_url.replace(/(\?select=)\S+(\}\})/, "");
         // var new_url = (base_url + "?select={\"air_temp\":{\"min\":" + minValueAT +
@@ -128,10 +146,14 @@
                 "min": minValueWS,
                 "max": maxValueWS
             },
-            "wind_direction": {
-                "min": minValueWD,
-                "max": maxValueWD
+            "wind_gust": {
+                "min": minValueWG,
+                "max": maxValueWG
             }
+            // "wind_direction": {
+            //     "min": minValueWD,
+            //     "max": maxValueWD
+            // }
         };
         // var newURL = base_url + "?select=" + JSON.stringify(filterInterface);
         var newURL = "?select=" + JSON.stringify(filterInterface);
@@ -148,7 +170,11 @@
             //     {selector: {"min": A, max": B}}
             var i = 0;
             // var li = Object.keys(filter).length
+            console.log(filterInterface)
             var filter = (filterInterface);
+            d3.selectAll("td").classed("bang", function () {
+                return false
+            });
             var key;
             for (key in Object.keys(filter)) {
                 var selector = (Object.keys(filter))[key];
@@ -160,6 +186,7 @@
                     selector].max;
                 console.log("Min = " + A);
                 console.log("Max = " + B);
+
                 if (typeof selector === "undefined") {
                     return false;
                 };
@@ -189,14 +216,24 @@
                 };
             };
         };
+        d3.selectAll("td").classed("boom", function (d) {
+            return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
+        })
+        d3.selectAll("td").classed("qcbang", function (d) {
+            if (d3.select(this).classed("boom") === true && d3.select(this).classed("bang") === true) {
+                return true
+            } else {
+                return false
+            }
+        })
     };
 </script>
 <!--<script src="assets/js/core/mesonet-current.min.js"></script>-->
 <script src="http://dev2.mesowest.net/tomato//assets/js/core/mesonet-current.js"></script>
-<script src="assets/js/core/sample_fire.js"></script>
+<script src="assets/js/core/chimney_top50.js"></script>
 <script src="http://dev2.mesowest.net/tomato//assets/js/core/d3.v4.js"></script>
 <!--<script src="assets/js/core/d3.v4.min.js"></script>-->
 <script src="assets/js/apps/app-fireperimeter.js"></script>
-<script src="http://dev2.mesowest.net/tomato//assets/js/core/units.js"></script>
+<script src="http://dev2.mesowest.net/tomato//assets/js/core/core.units.js"></script>
 
 </html>

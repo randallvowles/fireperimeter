@@ -10,12 +10,15 @@
     var apiArgs = M.windowArgs();
 
     // Force a set of variables
-    var rankedSensors = ["air_temp", "relative_humidity", "wind_speed", "wind_direction", "weather_condition"]
+    var rankedSensors = ["air_temp", "relative_humidity", "wind_speed", "wind_gust", "wind_cardinal_direction", "weather_condition"]
     apiArgs.vars = rankedSensors.join(",");
     apiArgs.units = "english";
     apiArgs.qc = "all";
-    apiArgs.recent = "61"
-    apiArgs.timeformat = "%s"
+    // apiArgs.recent = "61";
+    apiArgs.timeformat = "%s";
+    // Forced time for presentation purposes
+    apiArgs.start = "201611290000";
+    apiArgs.end = "201611290130";
 
     var tableArgs = {
         table_container: "#nettable-container",
@@ -23,16 +26,16 @@
         table_class: "",
         sensors: rankedSensors
     };
-    var headerNames = ["Station ID (STID)", "Distance From Fire Perimeter (miles)", "Bearing From Fire Perimeter (degrees)",
+    var headerNames = ["Station ID (STID)", "Distance From Fire Perimeter (miles)", "Bearing To Fire Perimeter (degrees)",
         "Time From Observation (minutes)", "Air Temperature (deg F)", "Relative Humidity (%)",
-        "Wind Speed (mph)", "Wind Direction (degrees)", "Weather Condition"
+        "Wind Speed (mph)", "Wind Gust (mph)", "Wind Direction (degrees)", "Weather Condition"
     ];
     var stidStack = [];
     var stidAndDist = [];
     var key;
-    for (key in sample_fire.nearest_stations) {
-        stidStack.push(sample_fire.nearest_stations[key]["STID"]);
-        stidAndDist.push(sample_fire.nearest_stations[key]["DFP"]);
+    for (key in chimney_top50.nearest_stations) {
+        stidStack.push(chimney_top50.nearest_stations[key]["STID"]);
+        stidAndDist.push(chimney_top50.nearest_stations[key]["DFP"]);
     };
 
     var stidList = stidStack.join(",");
@@ -44,6 +47,9 @@
 
     M.printResponse();
     $.when(M.async()).done(function () {
+        //timestamp and map function
+        // M.response.sensor.units[0].bfp = "Degrees"
+        // M.response.sensor.units[0].dfp = "Statute miles"
         _networkTableEmitter(M, tableArgs);
         _highlightCells(filter);
         _highlightQC(M.response);
@@ -108,9 +114,9 @@
                         tmp[d] = [stidAndDist[i][0]];
                     } else if (d === "bfp") {
                         tmp[d] = [stidAndDist[i][1]];
-                    } else if (d === "weather_condition") {
+                    } else if (d === "weather_condition" || d === "wind_cardinal_direction") {
                         try {
-                            tmp[d] = [_s[i].OBSERVATIONS["weather_condition_set_1d"][last]]
+                            tmp[d] = [_s[i].OBSERVATIONS[d + "_set_1d"][last]] // add to include cardinal direction
                         } catch (e) {
                             tmp[d] = [null];
                         }
@@ -126,7 +132,7 @@
                             if (typeof _s[i].QC[d + "_set_1"] !== "undefined") {
                                 // var _qcFlag = _s[i].QC
                                 // console.log(_s[i].QC[d + "_set_1"])
-                                tmp[d] = [_d, _s[i].QC[d + "_set_1"]]
+                                tmp[d] = [_d, _s[i].QC[d + "_set_1"][last]]
                             } else {
                                 tmp[d] = [_d]
                             }
@@ -186,16 +192,31 @@
                 d3.selectAll(".table-header").selectAll("i").classed("fa-chevron-circle-up", false);
                 d3.select("#" + _thisId).select("i")
                     .classed("fa-chevron-circle-up", function () {
-                        return _state ? true : false;
+                        if (d === "weather_condition" || d === "wind_cardinal_direction") {
+                            return null
+                        } else {
+                            return _state ? true : false;
+                        }
                     })
                     .classed("fa-chevron-circle-down", function () {
-                        return !_state ? true : false;
+                        if (d === "weather_condition" || d === "wind_cardinal_direction") {
+                            return null
+                        } else {
+                            return !_state ? true : false;
+                        }
                     });
             })
-            .append("i").attr("class", "sort-icon fa")
+            .append("i").attr("class", function (d) {
+                if (d === "weather_condition" || d === "wind_cardinal_direction") {
+                    return null
+                } else {
+                    return "sort-icon fa"
+                }
+            })
             .classed("fa-chevron-circle-down", function (d) {
                 return d === "dfp" ? true : false;
-            });
+            })
+
 
         // Create the rows
         var rows = table.append("tbody").attr("class", "scrollable")
@@ -225,10 +246,27 @@
             .attr("class", function (d) {
                 return (d.name)
             })
-            // add bang/qcbang attr call here
-            .attr("classed", function () {
-
+            .on("mouseover", function (d) {
+                // Call Bootstrap tooltip, this is one of the few jQuery dependencies
+                if (d3.select(this).classed("boom") === true || d3.select(this).classed("qcbang")) {
+                    if (typeof d.value === "object" && !!d.value[1] && d.name !== "date_time") {
+                        var s = "<div class=\"qc-tooltip\"><ul class=\"qc-tooltip\">";
+                        // console.log(_r.qc.metadata[d.value[last]])
+                        // s += "<li>" + _r.qc.metadata[last].NAME + "</li>";
+                        d.value[1].forEach(function (_d) {
+                            s += "<li>" + _r.qc.metadata[_d].NAME + "</li>";
+                        });
+                        s += "</ul></div>";
+                        $(this).tooltip({
+                            "title": "Observations has QC Flag: " + s,
+                            "placement": "top",
+                            "html": true,
+                            "container": "body"
+                        }).tooltip("show");
+                    }
+                }
             })
+
 
         var hyperlink = d3.selectAll(".stid")
             .on("click", function () {
@@ -236,10 +274,11 @@
             });
         var timeConversion = d3.selectAll(".date_time")
             .text(function (d) {
-                var timeNow = String(Date.now()).slice(0, -3);
+                // var timeNow = String(Date.now()).slice(0, -3);
+                var timeNow = String(Date.parse("Nov 29, 2016 01:35:00 UTC")).slice(0, -3);
                 return ((timeNow - d.value) / 60).toFixed(0);
             })
-        var disableSorting = d3.selectAll(".weather_condition").property("sorted", false).on("click", false);
+            // 1480384800
     }
 
 
