@@ -40,43 +40,60 @@
         .hide {
             display: none;
         }
+        
+        .qc-tooltip {
+            list-style: none;
+            margin-left: -1em;
+        }
     </style>
 </head>
 
 <body>
-    <div>
-        <article>
-            <h1>Weather Near Fires</h1>
-            </br>
-            <p>
-                To filter the results either enter the range for each parameter, enter the min field to create a greater-than parameter (leave
-                the max blank), or create a less-than parameter by entering the max (leave the min blank). Clicking on the
-                Station ID will take you to the MesoWest page for that station, where you can access graphics, timeseries
-                data from all sensors, and additional metadata.
-            </p>
-            <h3>Current time: Nov 29 2016 01:35:00 UTC</h3>
-        </article>
-    </div>
-    <div id="input_form.php">
-        <label>Air Temperature - </label>
-        <label>Min: <input type="text" maxlength=3 id="minValueAT"></label>
-        <label>Max: <input type="text" maxlength=3 id="maxValueAT"></label></br>
-        <label>Relative Humidity - </label>
-        <label>Min: <input type="text" maxlength=3 id="minValueRH" ></label>
-        <label>Max: <input type="text" maxlength=3 id="maxValueRH"></label></br>
-        <label>Wind Speed - </label>
-        <label>Min: <input type="text" maxlength=3 id="minValueWS"></label>
-        <label>Max: <input type="text" maxlength=3 id="maxValueWS"></label></br>
-        <label>Wind Gust - </label>
-        <label>Min: <input type="text" maxlength=3 id="minValueWG"></label>
-        <label>Max: <input type="text" maxlength=3 id="maxValueWG"></label></br>
-        <label>Wind Direction - </label>
+    <container>
+        <div class="row">
+            <div class="col-sm-12">
+                <article>
+                    <p class="lead">
+                        <h1>Monitoring Weather Conditions Near Wildfires</h1>
+                    </p>
+                    </br>
+                    <p>
+                        To filter the results either enter the range for each parameter, enter the min field to create a greater-than parameter (leave
+                        the max blank), or create a less-than parameter by entering the max (leave the min blank). Clicking
+                        on the Station ID will take you to the MesoWest page for that station, where you can access graphics,
+                        timeseries data from all sensors, and additional metadata. Cells highlighted yellow indicate a QC
+                        flag associated with that observation, hover over the cell for the QC flag description. 
+                    </p>
+                    <h4>Current time: Nov 29 2016 01:35:00 UTC</h4>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-3">
+                <label>Air Temperature - </label></br>
+                <label>Min: <input type="text" maxlength=3 id="minValueAT"></label></br>
+                <label>Max: <input type="text" maxlength=3 id="maxValueAT"></label></br>
+                <label>Relative Humidity - </label></br>
+                <label>Min: <input type="text" maxlength=3 id="minValueRH" ></label></br>
+                <label>Max: <input type="text" maxlength=3 id="maxValueRH"></label></br>
+                <label>Wind Speed - </label></br>
+                <label>Min: <input type="text" maxlength=3 id="minValueWS"></label></br>
+                <label>Max: <input type="text" maxlength=3 id="maxValueWS"></label></br>
+                <label>Wind Gust - </label></br>
+                <label>Min: <input type="text" maxlength=3 id="minValueWG"></label></br>
+                <label>Max: <input type="text" maxlength=3 id="maxValueWG"></label></br>
+                <!--<label>Wind Direction - </label>
         <label>Min: <input type="text" maxlength=3 id="minValueWD"></label>
-        <label>Max: <input type="text" maxlength=3 id="maxValueWD"></label></br>
-        <input type="button" value="Apply" id="applyRule" onclick=_applyRule()>
-        <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" onclick="_exclusions(this);"></label></br>
-    </div>
-    <div id="nettable-container"></div>
+        <label>Max: <input type="text" maxlength=3 id="maxValueWD"></label></br>-->
+                <input type="button" value="Apply" id="applyRule" onclick=_applyRule()>
+                <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" onclick="_exclusions(this);"></label></br>
+            </div>
+            <div class="col-sm-12 col-md-9">
+                <div class="table-responsive">
+                    <table class="table table-condensed">
+                        <div id="nettable-container"></div>
+                </div>
+            </div>
 </body>
 <script type="text/javascript">
     function _exclusions(checkbox) {
@@ -105,8 +122,8 @@
         var maxValueWS = Number(document.getElementById('maxValueWG').value);
         var minValueWG = Number(document.getElementById('minValueWG').value);
         var maxValueWG = Number(document.getElementById('maxValueWS').value);
-        var minValueWD = Number(document.getElementById('minValueWD').value);
-        var maxValueWD = Number(document.getElementById('maxValueWD').value);
+        // var minValueWD = Number(document.getElementById('minValueWD').value);
+        // var maxValueWD = Number(document.getElementById('maxValueWD').value);
         var current_url = window.location.href
         var base_url = current_url.replace(/(\?select=)\S+(\}\})/, "");
         // var new_url = (base_url + "?select={\"air_temp\":{\"min\":" + minValueAT +
@@ -132,11 +149,11 @@
             "wind_gust": {
                 "min": minValueWG,
                 "max": maxValueWG
-            },
-            "wind_direction": {
-                "min": minValueWD,
-                "max": maxValueWD
             }
+            // "wind_direction": {
+            //     "min": minValueWD,
+            //     "max": maxValueWD
+            // }
         };
         // var newURL = base_url + "?select=" + JSON.stringify(filterInterface);
         var newURL = "?select=" + JSON.stringify(filterInterface);
