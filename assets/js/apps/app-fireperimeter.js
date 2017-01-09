@@ -19,6 +19,7 @@
     // Forced time for presentation purposes
     apiArgs.start = "201611290000";
     apiArgs.end = "201611290130";
+    apiArgs.uimode = "default"
 
     var tableArgs = {
         table_container: "#nettable-container",
@@ -28,7 +29,7 @@
     };
     var headerNames = ["Station ID (STID)", "Distance From Fire Perimeter (miles)", "Bearing To Fire Perimeter (degrees)",
         "Time From Observation (minutes)", "Air Temperature (deg F)", "Relative Humidity (%)",
-        "Wind Speed (mph)", "Wind Gust (mph)", "Wind Direction (degrees)", "Weather Condition"
+        "Wind Speed (mph)", "Wind Gust (mph)", "Wind Direction (cardinal)", "Weather Condition"
     ];
     var stidStack = [];
     var stidAndDist = [];
@@ -44,17 +45,15 @@
         api_args: apiArgs
     });
     var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
-
+    // console.log(filter)
     M.printResponse();
     $.when(M.async()).done(function () {
         //timestamp and map function
-        // M.response.sensor.units[0].bfp = "Degrees"
-        // M.response.sensor.units[0].dfp = "Statute miles"
+        M.response.sensor.units[0].bfp = "Degrees"
+        M.response.sensor.units[0].dfp = "Statute miles"
         _networkTableEmitter(M, tableArgs);
         _highlightCells(filter);
         _highlightQC(M.response);
-        // d3.select("applyRule").on("click", function () {
-        //     _highlightCells(filter);
         // })
 
 
@@ -149,13 +148,10 @@
             i++;
         }
 
-        // console.log("Sorted stations with most recent ob");
-        // console.log(stations);
-
         // Create and append table to DOM, but first check to see if we have a table node.
         d3.select("body " + args.table_container).selectAll("table").remove();
         var table = d3.select("body " + args.table_container).append("table")
-            .attr("id", args.table_id)
+            .attr("id", args.table_id).classed("table table-condensed", true)
             // .data(headerNames).enter().append("th")
             // Make the header
         table.append("thead").attr("class", "fixed-header").append("tr")
@@ -164,6 +160,16 @@
                 // console.log(i); 
                 return headerNames[i];
             })
+            .classed("tabtable-header pull-left", true)
+            .attr("class", function (d) { return d.split("_set_")[0]; }, true)
+            .classed("hidden hidden-sensor", function (d) {
+                var _s = d.split("_set_")[0];
+                return !(
+                    P.displaySensor(_s) === null ?
+                        _r.ui.sensors[_r.ui.toc[_s]].default : P.displaySensor(_s)
+                );
+            })
+            .classed("first-column", function (d) { return d === "date_time" ? true : false; })
             .attr("id", function (d) {
                 return d;
             })
@@ -251,8 +257,6 @@
                 if (d3.select(this).classed("boom") === true || d3.select(this).classed("qcbang")) {
                     if (typeof d.value === "object" && !!d.value[1] && d.name !== "date_time") {
                         var s = "<div class=\"qc-tooltip\"><ul class=\"qc-tooltip\">";
-                        // console.log(_r.qc.metadata[d.value[last]])
-                        // s += "<li>" + _r.qc.metadata[last].NAME + "</li>";
                         d.value[1].forEach(function (_d) {
                             s += "<li>" + _r.qc.metadata[_d].NAME + "</li>";
                         });
@@ -278,7 +282,6 @@
                 var timeNow = String(Date.parse("Nov 29, 2016 01:35:00 UTC")).slice(0, -3);
                 return ((timeNow - d.value) / 60).toFixed(0);
             })
-            // 1480384800
     }
 
 
@@ -290,72 +293,67 @@
         //     object in the form:
         //     {selector: {"min": A, max": B}}
         var i = 0;
-        var li = Object.keys(filter).length
+        d3.selectAll("td").classed("bang", function () {
+            return false
+        });
         var key;
-
-        // while (i < li) {
         for (key in Object.keys(filter)) {
             var selector = (Object.keys(filter))[key];
             console.log("Variable selected = " + selector);
             // assign min/max values, test for null
-            var A = typeof filter[selector].min === "undefined" ? null : filter[selector].min;
-            var B = typeof filter[selector].max === "undefined" ? null : filter[selector].max;
-            // var A = typeof filter[selector].min === "undefined" || filter[selector].min === "NaN" ? null : filter[selector].min;
-            // var B = typeof filter[selector].max === "undefined" || filter[selector].max === "NaN" ? null : filter[selector].max;
-            // console.log("Min = " + A);
-            // console.log("Max = " + B);
+            var A = typeof filter[selector].min === "undefined" || filter[selector].min === 0 ? null : filter[
+                selector].min;
+            var B = typeof filter[selector].max === "undefined" || filter[selector].max === 0 ? null : filter[
+                selector].max;
+            console.log("Min = " + A);
+            console.log("Max = " + B);
             if (typeof selector === "undefined") {
                 return false;
             };
             // if (typeof A !== "undefined" || A !== null && typeof B !== "undefined" || B !== null) {
             if (A !== null && B !== null) {
                 // range code, given a min and a max
-                d3.selectAll("." + selector).classed("bang", function () {
+                d3.selectAll('.' + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) > A &&
                         Number(d3.select(this).text()) < B ? true : false;
                 });
                 // } else if (typeof A !== "undefined" || A !== null && typeof B === "undefined" || B === null) {
             } else if (A !== null && B === null) {
                 // greater-than code, min but no max
-                d3.selectAll("." + selector).classed("bang", function () {
+                d3.selectAll('.' + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) > A ? true : false;
                 });
                 // } else if (typeof A === "undefined" || A === null && typeof B !== "undefined" || B !== null) {
             } else if (A === null && B !== null) {
                 // less-than code, max but no min
-                d3.selectAll("." + selector).classed("bang", function () {
+                d3.selectAll('.' + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) < B ? true : false;
                 });
             } else if (A === null && B === null) {
-                // d3.selectAll("td").classed("hide", function(){
-                //     return true
-                // })
-                // return false;
                 continue;
             } else {
                 console.log("Bang! Bang! Something went terribly wrong!")
             };
-            // i++;
         };
+
+        d3.selectAll("td").classed("boom", function (d) {
+            return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
+        })
+        d3.selectAll("td").classed("qcbang", function (d) {
+            if (d3.select(this).classed("boom") === true && d3.select(this).classed("bang") === true) {
+                return true
+            } else {
+                return false
+            }
+        })
     };
+
 
     /**
      * Highlights Cells based on API QC flags
      * @param {object} API response
      */
     function _highlightQC(object) {
-        // var _r = M.response;
-        // var _s = _r.station;
-        // var qcFlagged = [];
-        // var i;
-        // for (i in _s) {
-        //     if (_s[i]["QC_FLAGGED"] == true) {
-        //         qcFlagged.push(_s[i]["STID"]);
-
-        //     } else {
-        //         continue;
-        //     }
-        // }
         d3.selectAll("td").classed("boom", function (d) {
             return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
         })
@@ -367,12 +365,4 @@
             }
         })
     }
-
-    // function _exclusions(checkbox) {
-    //     d3.selectAll("tr").classed("hide", function () {
-    //         if (d3.select(this).classed("boom") !== true || d3.select(this).classed("bang") !== true || d3.select(this).classed("qcbang") !== true) {
-    //             return checkbox.checked ? true : false;
-    //         }
-    //     })
-    // }
 })();
