@@ -51,12 +51,69 @@
         //timestamp and map function
         M.response.sensor.units[0].bfp = "Degrees"
         M.response.sensor.units[0].dfp = "Statute miles"
+        M.response.ui.toc["bfp"] = 4
+        M.response.ui.toc["dfp"] = 5
+        M.response.ui.toc["stid"] = 6
+        M.response.ui.toc["wind_cardinal_direction"] = 7
+        M.response.ui.toc["weather_condition"] = 8
+        M.response.ui.toc["date_time"] = 9
+        M.response.ui.sensors[4] = {
+            "apiname": "bfp",
+            "default": "true",
+            "group": 99,
+            "longname": "Bearing From Perimeter",
+            "pos": 99,
+            "shortname": "BFP",
+            "vid": 99
+        }
+        M.response.ui.sensors[5] = {
+            "apiname": "dfp",
+            "default": "true",
+            "group": 99,
+            "longname": "Distance From Perimeter",
+            "pos": 99,
+            "shortname": "DFP",
+            "vid": 99
+        }
+        M.response.ui.sensors[6] = {
+            "apiname": "stid",
+            "default": "true",
+            "group": 99,
+            "longname": "Station ID",
+            "pos": 99,
+            "shortname": "STID",
+            "vid": 99
+        }
+        M.response.ui.sensors[7] = {
+            "apiname": "wind_cardinal_direction",
+            "default": "true",
+            "group": 99,
+            "longname": "Wind Cardinal Direction",
+            "pos": 99,
+            "shortname": "WD",
+            "vid": 99
+        }
+        M.response.ui.sensors[8] = {
+            "apiname": "weather_condition",
+            "default": "true",
+            "group": 99,
+            "longname": "Weather Condition",
+            "pos": 99,
+            "shortname": "WC",
+            "vid": 99
+        }
+        M.response.ui.sensors[9] = {
+            "apiname": "date_time",
+            "default": "true",
+            "group": 99,
+            "longname": "Time From Observation",
+            "pos": 99,
+            "shortname": "TFO",
+            "vid": 99
+        }
         _networkTableEmitter(M, tableArgs);
         _highlightCells(filter);
         _highlightQC(M.response);
-        // })
-
-
     });
     return
 
@@ -156,22 +213,59 @@
             // Make the header
         table.append("thead").attr("class", "fixed-header").append("tr")
             .selectAll("th").data(["stid"].concat(rankedSensors)).enter().append("th")
-            .html(function (d, i) {
-                // console.log(i); 
-                return headerNames[i];
-            })
+            // .html(function (d, i) {
+            //     // console.log(i); 
+            //     return headerNames[i];
+            // })
             .classed("tabtable-header pull-left", true)
-            .attr("class", function (d) { return d.split("_set_")[0]; }, true)
+            .attr("class", function (d) {
+                return d.split("_set_")[0];
+            }, true)
             .classed("hidden hidden-sensor", function (d) {
-                var _s = d.split("_set_")[0];
+                if (d !== "date_time") {
+                    var _s = d.split("_set_")[0];
+                } else {
+                    var _s = d[0]
+                }
                 return !(
-                    P.displaySensor(_s) === null ?
-                        _r.ui.sensors[_r.ui.toc[_s]].default : P.displaySensor(_s)
+                    _r.ui.sensors[_r.ui.toc[_s]]
                 );
             })
-            .classed("first-column", function (d) { return d === "date_time" ? true : false; })
             .attr("id", function (d) {
                 return d;
+            })
+            .html(function (d) {
+                if (d !== "date_time") {
+                    var _v = d.split("_set_");
+                } else {
+                    var _v = d
+                }
+                // Number of similar sensors
+                var _n = 1;
+                _n = _n === 1 ? "" : " #" + _n;
+                // Is variable derived? Look for `d`.
+                var _w = typeof _v[1] !== "undefined" && _v[1].split("d").length > 1 ?
+                    "<sup>&#8226;</sup>" : "";
+                d3.select(this).classed("derived-variable", function () {
+                    return _w === "<sup>&#8226;</sup>" ? true : false;
+                });
+                // Updated for the UI helper
+                console.log(d)
+                return d === "date_time" ? "Time" : _r.ui.sensors[_r.ui.toc[_v[0]]].shortname + _w + _n;
+            })
+            .on("mouseover", function (d) {
+                if (d !== "date_time") {
+                    $(this).tooltip({
+                        "title": _fmtSensor(_r.ui.sensors[_r.ui.toc[d.split("_set_")[0]]].longname) +
+                            (typeof _s.SENSOR_VARIABLES[d.split("_set_")[0]][d].position === "undefined" ||
+                                _s.SENSOR_VARIABLES[d.split("_set_")[0]][d].position === null ?
+                                "" :
+                                "<br/>Height: " + _s.SENSOR_VARIABLES[d.split("_set_")[0]][d].position + "m"),
+                        "placement": "top",
+                        "html": true,
+                        "container": "body"
+                    }).tooltip("show");
+                }
             })
             .classed("table-header", true)
             .property("sorted", false)
@@ -365,4 +459,16 @@
             }
         })
     }
+
+    /**
+     * Pretty formatter for defaulted Mesonet API sensor names
+     * @param a {string} - sensor name
+     */
+    function _fmtSensor(a) {
+        return (typeof a !== "string" || a.split("_").length === 1) ? a :
+            a.split("_").map(function (d) {
+                return d.charAt(0).toUpperCase() + d.slice(1);
+            }).join(" ");
+    }
+
 })();
