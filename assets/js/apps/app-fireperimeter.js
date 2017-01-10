@@ -10,9 +10,9 @@
     var apiArgs = M.windowArgs();
 
     // Force a set of variables
-    var rankedSensors = ["air_temp", "relative_humidity", "wind_speed", "wind_gust", "wind_cardinal_direction", "weather_condition"]
+    var rankedSensors = ["air_temp", "relative_humidity", "wind_speed", "wind_gust", "wind_direction", "weather_condition"]
     apiArgs.vars = rankedSensors.join(",");
-    apiArgs.units = "english";
+    apiArgs.units = "english,speed|mph";
     apiArgs.qc = "all";
     // apiArgs.recent = "61";
     apiArgs.timeformat = "%s";
@@ -27,9 +27,9 @@
         table_class: "",
         sensors: rankedSensors
     };
-    var headerNames = ["Station ID (STID)", "Distance From Fire Perimeter (miles)", "Bearing To Fire Perimeter (degrees)",
-        "Time From Observation (minutes)", "Air Temperature (deg F)", "Relative Humidity (%)",
-        "Wind Speed (mph)", "Wind Gust (mph)", "Wind Direction (cardinal)", "Weather Condition"
+    var headerNames = ["Station ID", "Distance From Fire Perimeter", "Bearing To Fire Perimeter",
+        "Time From Observation", "Air Temperature", "Relative Humidity",
+        "Wind Speed", "Wind Gust", "Wind Direction", "Weather Condition"
     ];
     var stidStack = [];
     var stidAndDist = [];
@@ -51,12 +51,14 @@
         //timestamp and map function
         M.response.sensor.units[0].bfp = "Degrees"
         M.response.sensor.units[0].dfp = "Statute miles"
+        M.response.sensor.units[0].time = "Minutes"
+        M.response.sensor.units[0].wind_direction = "Code"
         M.response.ui.toc["bfp"] = 4
         M.response.ui.toc["dfp"] = 5
         M.response.ui.toc["stid"] = 6
         M.response.ui.toc["wind_cardinal_direction"] = 7
         M.response.ui.toc["weather_condition"] = 8
-        M.response.ui.toc["date_time"] = 9
+        M.response.ui.toc["time"] = 9
         M.response.ui.sensors[4] = {
             "apiname": "bfp",
             "default": "true",
@@ -103,7 +105,7 @@
             "vid": 99
         }
         M.response.ui.sensors[9] = {
-            "apiname": "date_time",
+            "apiname": "time",
             "default": "true",
             "group": 99,
             "longname": "Time From Observation",
@@ -213,60 +215,60 @@
             // Make the header
         table.append("thead").attr("class", "fixed-header").append("tr")
             .selectAll("th").data(["stid"].concat(rankedSensors)).enter().append("th")
-            // .html(function (d, i) {
-            //     // console.log(i); 
-            //     return headerNames[i];
-            // })
-            .classed("tabtable-header pull-left", true)
-            .attr("class", function (d) {
-                return d.split("_set_")[0];
-            }, true)
-            .classed("hidden hidden-sensor", function (d) {
-                if (d !== "date_time") {
-                    var _s = d.split("_set_")[0];
-                } else {
-                    var _s = d[0]
-                }
-                return !(
-                    _r.ui.sensors[_r.ui.toc[_s]]
-                );
+            .html(function (d, i) {
+                // console.log(i); 
+                return headerNames[i];
             })
+            // .classed("tabtable-header pull-left", true)
+            // .attr("class", function (d) {
+            //     return d.split("_set_")[0];
+            // }, true)
+            // .classed("hidden hidden-sensor", function (d) {
+            //     if (d !== "date_time") {
+            //         var _s = d.split("_set_")[0];
+            //     } else {
+            //         var _s = d[0]
+            //     }
+            //     return !(
+            //         _r.ui.sensors[_r.ui.toc[_s]]
+            //     );
+            // })
             .attr("id", function (d) {
                 return d;
             })
-            .html(function (d) {
-                if (d !== "date_time") {
-                    var _v = d.split("_set_");
-                } else {
-                    var _v = d
-                }
-                // Number of similar sensors
-                var _n = 1;
-                _n = _n === 1 ? "" : " #" + _n;
-                // Is variable derived? Look for `d`.
-                var _w = typeof _v[1] !== "undefined" && _v[1].split("d").length > 1 ?
-                    "<sup>&#8226;</sup>" : "";
-                d3.select(this).classed("derived-variable", function () {
-                    return _w === "<sup>&#8226;</sup>" ? true : false;
-                });
-                // Updated for the UI helper
-                console.log(d)
-                return d === "date_time" ? "Time" : _r.ui.sensors[_r.ui.toc[_v[0]]].shortname + _w + _n;
-            })
-            .on("mouseover", function (d) {
-                if (d !== "date_time") {
-                    $(this).tooltip({
-                        "title": _fmtSensor(_r.ui.sensors[_r.ui.toc[d.split("_set_")[0]]].longname) +
-                            (typeof _s.SENSOR_VARIABLES[d.split("_set_")[0]][d].position === "undefined" ||
-                                _s.SENSOR_VARIABLES[d.split("_set_")[0]][d].position === null ?
-                                "" :
-                                "<br/>Height: " + _s.SENSOR_VARIABLES[d.split("_set_")[0]][d].position + "m"),
-                        "placement": "top",
-                        "html": true,
-                        "container": "body"
-                    }).tooltip("show");
-                }
-            })
+            // .html(function (d) {
+            //     if (d !== "date_time") {
+            //         var _v = d.split("_set_");
+            //     } else {
+            //         var _v = d
+            //     }
+            //     // Number of similar sensors
+            //     var _n = 1;
+            //     _n = _n === 1 ? "" : " #" + _n;
+            //     // Is variable derived? Look for `d`.
+            //     var _w = typeof _v[1] !== "undefined" && _v[1].split("d").length > 1 ?
+            //         "<sup>&#8226;</sup>" : "";
+            //     d3.select(this).classed("derived-variable", function () {
+            //         return _w === "<sup>&#8226;</sup>" ? true : false;
+            //     });
+            //     // Updated for the UI helper
+            //     console.log(d)
+            //     return d === "date_time" ? "Time" : _r.ui.sensors[_r.ui.toc[_v[0]]].shortname + _w + _n;
+            // })
+            // .on("mouseover", function (d) {
+            //     if (d !== "date_time") {
+            //         $(this).tooltip({
+            //             "title": _fmtSensor(_r.ui.sensors[_r.ui.toc[d.split("_set_")[0]]].longname) +
+            //                 (typeof _s.SENSOR_VARIABLES[d.split("_set_")[0]][d].position === "undefined" ||
+            //                     _s.SENSOR_VARIABLES[d.split("_set_")[0]][d].position === null ?
+            //                     "" :
+            //                     "<br/>Height: " + _s.SENSOR_VARIABLES[d.split("_set_")[0]][d].position + "m"),
+            //             "placement": "top",
+            //             "html": true,
+            //             "container": "body"
+            //         }).tooltip("show");
+            //     }
+            // })
             .classed("table-header", true)
             .property("sorted", false)
             .on('click', function (d) {
@@ -317,6 +319,30 @@
                 return d === "dfp" ? true : false;
             })
 
+        // Add the units to the table. We add this as a `TD` in the `THEAD` node.  If you change 
+        // this to `TH` you will need to update the filtering of `TH` elements in the update 
+        // table width routine.
+        table.select("thead").append("tr")
+            .selectAll("th").data(["stid"].concat(rankedSensors)).enter().append("td")
+            // .attr("id", function (d) {
+            //     return d === "date_time" ? "date-time-locale" : "";
+            // })
+            .classed("tabtable-units", true)
+            // .classed("hidden", function (d) {
+            //     var _s = d.split("_set_")[0];
+            //     return !(
+            //         P.displaySensor(_s) === null ?
+            //             _r.ui.sensors[_r.ui.toc[_s]].default : P.displaySensor(_s)
+            //     );
+            // })
+            .html(function (d) {
+                var _n = 1;
+                return d === "stid" ? null :
+                    typeof U.get(_r.sensor.units[0][d.split("_set_")[0]]).html === "undefined" ?
+                        _r.sensor.units[0][d.split("_set_")[0]] :
+                        U.get(_r.sensor.units[0][d.split("_set_")[0]]).html;
+            })
+            // .on("click", function (d) { _showSettingsModal(d3.select(this).attr("class"), args); });
 
         // Create the rows
         var rows = table.append("tbody").attr("class", "scrollable")
@@ -376,6 +402,14 @@
                 var timeNow = String(Date.parse("Nov 29, 2016 01:35:00 UTC")).slice(0, -3);
                 return ((timeNow - d.value) / 60).toFixed(0);
             })
+        //     // Wind Dir
+        // DirTable = ["N","NNE","NE","ENE","E","ESE", "SE","SSE","S","SSW","SW","WSW", "W","WNW","NW","NNW","N"];
+        // if (windDir !== undefined){
+        // r = Math.round(windDir);
+        // windDir= DirTable[Math.floor((r+11.25)/22.5)];
+        // } else {
+        // windDir = 'N/A';
+        // }
     }
 
 
@@ -430,7 +464,7 @@
             };
         };
 
-        d3.selectAll("td").classed("boom", function (d) {
+        d3.select("tbody").selectAll("td").classed("boom", function (d) {
             return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
         })
         d3.selectAll("td").classed("qcbang", function (d) {
