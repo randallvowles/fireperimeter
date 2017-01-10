@@ -3,34 +3,31 @@
 <html>
 
 <head>
+    <title>Current Fire Weather</title>
     <link href='assets/fonts/font-awesome-4.7.0/css/font-awesome.min.css' rel="stylesheet">
-    <link href='assets/css/main.css' rel="stylesheet">
+    <!--<link href='assets/css/main.css' rel="stylesheet">-->
+    <link href="http://dev2.mesowest.net//tomato/assets/css/main.css" rel="stylesheet">
     <script src="assets/js/core/baseplate.js"></script>
     <style>
-        td,
-        th {
-            padding: 1px 4px;
-            border: 1px solid black;
-        }
-        
-        table {
-            border-collapse: collapse;
-            border: 1px solid black;
-        }
-        
         .bang {
             background: red;
             font-weight: bold;
+            border: 1px solid black !important;
+            text-align: center;
         }
         
         .boom {
             background: yellow;
             font-weight: bold;
+            border: 1px solid black !important;
+            text-align: center;
         }
         
         .qcbang {
             background: repeating-linear-gradient(-65deg, red, red 45px, yellow 45px, yellow 65px);
             font-weight: bold;
+            border: 1px solid black !important;
+            text-align: center;
         }
         
         .hasBang {
@@ -45,6 +42,15 @@
             list-style: none;
             margin-left: -1em;
         }
+        
+        .border-right {
+            border-right: 1px solid #e5e5e5;
+            padding-left: 0.5em;
+        }
+        
+        .table td {
+            white-space: nowrap;
+        }
     </style>
 </head>
 
@@ -53,45 +59,55 @@
         <div class="row">
             <div class="col-sm-12">
                 <article>
-                    <p class="lead">
+                    <p class="page-title">
                         <h1>Monitoring Weather Conditions Near Wildfires</h1>
                     </p>
-                    </br>
+                    <hr/>
                     <p>
                         To filter the results either enter the range for each parameter, enter the min field to create a greater-than parameter (leave
-                        the max blank), or create a less-than parameter by entering the max (leave the min blank). Clicking
-                        on the Station ID will take you to the MesoWest page for that station, where you can access graphics,
-                        timeseries data from all sensors, and additional metadata. Cells highlighted yellow indicate a QC
-                        flag associated with that observation, hover over the cell for the QC flag description. 
+                        the max blank), or create a less-than parameter by entering the max (leave the min blank).
                     </p>
+                    <p>
+                        Clicking on the Station ID will take you to the MesoWest page for that station, where you can access graphical displays,
+                        timeseries data from all sensors, and additional metadata.
+                    </p>
+                    <p>
+                        Cells highlighted yellow indicate a QC flag associated with that observation, hover over the cell for the QC flag description.
+                    </p>
+                    <hr/>
                     <h4>Current time: Nov 29 2016 01:35:00 UTC</h4>
+                    <hr/>
                 </article>
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12 col-md-3">
+            <div class="col-sm-12 col-md-2 border-right">
                 <label>Air Temperature - </label></br>
-                <label>Min: <input type="text" maxlength=3 id="minValueAT"></label></br>
-                <label>Max: <input type="text" maxlength=3 id="maxValueAT"></label></br>
+                <label>Min: <input type="text" maxlength="3" size="10" id="minValueAT"></label></br>
+                <label>Max: <input type="text" maxlength=3 size="10" id="maxValueAT"></label></br>
                 <label>Relative Humidity - </label></br>
-                <label>Min: <input type="text" maxlength=3 id="minValueRH" ></label></br>
-                <label>Max: <input type="text" maxlength=3 id="maxValueRH"></label></br>
+                <label>Min: <input type="text" maxlength=3 size="10" id="minValueRH" ></label></br>
+                <label>Max: <input type="text" maxlength=3 size="10" id="maxValueRH"></label></br>
                 <label>Wind Speed - </label></br>
-                <label>Min: <input type="text" maxlength=3 id="minValueWS"></label></br>
-                <label>Max: <input type="text" maxlength=3 id="maxValueWS"></label></br>
+                <label>Min: <input type="text" maxlength=3 size="10" id="minValueWS"></label></br>
+                <label>Max: <input type="text" maxlength=3 size="10" id="maxValueWS"></label></br>
                 <label>Wind Gust - </label></br>
-                <label>Min: <input type="text" maxlength=3 id="minValueWG"></label></br>
-                <label>Max: <input type="text" maxlength=3 id="maxValueWG"></label></br>
+                <label>Min: <input type="text" maxlength=3 size="10" id="minValueWG"></label></br>
+                <label>Max: <input type="text" maxlength=3 size="10" id="maxValueWG"></label></br>
                 <!--<label>Wind Direction - </label>
         <label>Min: <input type="text" maxlength=3 id="minValueWD"></label>
         <label>Max: <input type="text" maxlength=3 id="maxValueWD"></label></br>-->
-                <input type="button" value="Apply" id="applyRule" onclick=_applyRule()>
-                <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" onclick="_exclusions(this);"></label></br>
+        <hr/>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" onclick=_applyRule()>Apply</button>
+                    <button type="button" class="btn btn-default" onclick=_updateURL()>Apply & Update URL</button>
+                </div>
+                <hr/>
+                <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" onclick="_exclusions(this);"></label><hr/>
             </div>
-            <div class="col-sm-12 col-md-9">
+            <div class="col-sm-12 col-md-10">
                 <div class="table-responsive">
-                    <table class="table table-condensed">
-                        <div id="nettable-container"></div>
+                    <div id="nettable-container"></div>
                 </div>
             </div>
 </body>
@@ -112,6 +128,45 @@
         })
     }
 
+    function _updateURL() {
+        var minValueAT = Number(document.getElementById('minValueAT').value);
+        var maxValueAT = Number(document.getElementById('maxValueAT').value);
+        var minValueRH = Number(document.getElementById('minValueRH').value);
+        var maxValueRH = Number(document.getElementById('maxValueRH').value);
+        var minValueWS = Number(document.getElementById('minValueWS').value);
+        var maxValueWS = Number(document.getElementById('maxValueWG').value);
+        var minValueWG = Number(document.getElementById('minValueWG').value);
+        var maxValueWG = Number(document.getElementById('maxValueWS').value);
+        // var minValueWD = Number(document.getElementById('minValueWD').value);
+        // var maxValueWD = Number(document.getElementById('maxValueWD').value);
+        var current_url = window.location.href
+        var base_url = current_url.replace(/(\?select=)\S+(\}\})/, "");
+        var filterInterface = {
+            "air_temp": {
+                "min": minValueAT,
+                "max": maxValueAT
+            },
+            "relative_humidity": {
+                "min": minValueRH,
+                "max": maxValueRH
+            },
+            "wind_speed": {
+                "min": minValueWS,
+                "max": maxValueWS
+            },
+            "wind_gust": {
+                "min": minValueWG,
+                "max": maxValueWG
+            }
+            // "wind_direction": {
+            //     "min": minValueWD,
+            //     "max": maxValueWD
+            // }
+        };
+        var newURL = base_url + "?select=" + JSON.stringify(filterInterface);
+        // var newURL = "?select=" + JSON.stringify(filterInterface);
+        window.location.href = newURL;
+    }
 
     function _applyRule() {
         var minValueAT = Number(document.getElementById('minValueAT').value);
@@ -126,13 +181,6 @@
         // var maxValueWD = Number(document.getElementById('maxValueWD').value);
         var current_url = window.location.href
         var base_url = current_url.replace(/(\?select=)\S+(\}\})/, "");
-        // var new_url = (base_url + "?select={\"air_temp\":{\"min\":" + minValueAT +
-        //     ",\"max\":" + maxValueAT + "},\"relative_humidity\":{\"min\":" +
-        //     minValueRH + ",\"max\":" + maxValueRH + "},\"wind_speed\":{\"min\":" +
-        //     minValueWS + ",\"max\":" + maxValueWS + "},\"wind_direction\":{\"min\":" +
-        //     minValueWD +
-        //     ",\"max\":" + maxValueWD + "}}");
-        // window.location.href = new_url;
         var filterInterface = {
             "air_temp": {
                 "min": minValueAT,
@@ -156,7 +204,7 @@
             // }
         };
         // var newURL = base_url + "?select=" + JSON.stringify(filterInterface);
-        var newURL = "?select=" + JSON.stringify(filterInterface);
+        // var newURL = "?select=" + JSON.stringify(filterInterface);
         // window.location.href = newURL;
         _highlightCells(filterInterface)
 
@@ -169,8 +217,6 @@
             //     object in the form:
             //     {selector: {"min": A, max": B}}
             var i = 0;
-            // var li = Object.keys(filter).length
-            console.log(filterInterface)
             var filter = (filterInterface);
             d3.selectAll("td").classed("bang", function () {
                 return false
@@ -178,15 +224,14 @@
             var key;
             for (key in Object.keys(filter)) {
                 var selector = (Object.keys(filter))[key];
-                console.log("Variable selected = " + selector);
+                // console.log("Variable selected = " + selector);
                 // assign min/max values, test for null
                 var A = typeof filter[selector].min === "undefined" || filter[selector].min === 0 ? null : filter[
                     selector].min;
                 var B = typeof filter[selector].max === "undefined" || filter[selector].max === 0 ? null : filter[
                     selector].max;
-                console.log("Min = " + A);
-                console.log("Max = " + B);
-
+                // console.log("Min = " + A);
+                // console.log("Max = " + B);
                 if (typeof selector === "undefined") {
                     return false;
                 };

@@ -10,15 +10,16 @@
     var apiArgs = M.windowArgs();
 
     // Force a set of variables
-    var rankedSensors = ["air_temp", "relative_humidity", "wind_speed", "wind_gust", "wind_cardinal_direction", "weather_condition"]
+    var rankedSensors = ["air_temp", "relative_humidity", "wind_speed", "wind_gust", "wind_direction", "weather_condition"]
     apiArgs.vars = rankedSensors.join(",");
-    apiArgs.units = "english";
+    apiArgs.units = "english,speed|mph";
     apiArgs.qc = "all";
     // apiArgs.recent = "61";
     apiArgs.timeformat = "%s";
     // Forced time for presentation purposes
     apiArgs.start = "201611290000";
     apiArgs.end = "201611290130";
+    apiArgs.uimode = "default"
 
     var tableArgs = {
         table_container: "#nettable-container",
@@ -26,9 +27,9 @@
         table_class: "",
         sensors: rankedSensors
     };
-    var headerNames = ["Station ID (STID)", "Distance From Fire Perimeter (miles)", "Bearing To Fire Perimeter (degrees)",
-        "Time From Observation (minutes)", "Air Temperature (deg F)", "Relative Humidity (%)",
-        "Wind Speed (mph)", "Wind Gust (mph)", "Wind Direction (degrees)", "Weather Condition"
+    var headerNames = ["Station ID", "Distance From Fire Perimeter", "Bearing To Fire Perimeter",
+        "Time From Observation", "Air Temperature", "Relative Humidity",
+        "Wind Speed", "Wind Gust", "Wind Direction", "Weather Condition"
     ];
     var stidStack = [];
     var stidAndDist = [];
@@ -44,20 +45,77 @@
         api_args: apiArgs
     });
     var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
-
+    // console.log(filter)
     M.printResponse();
     $.when(M.async()).done(function () {
         //timestamp and map function
-        // M.response.sensor.units[0].bfp = "Degrees"
-        // M.response.sensor.units[0].dfp = "Statute miles"
+        M.response.sensor.units[0].bfp = "Degrees"
+        M.response.sensor.units[0].dfp = "Statute miles"
+        M.response.sensor.units[0].time = "Minutes"
+        M.response.sensor.units[0].wind_direction = "Code"
+        M.response.ui.toc["bfp"] = 4
+        M.response.ui.toc["dfp"] = 5
+        M.response.ui.toc["stid"] = 6
+        M.response.ui.toc["wind_cardinal_direction"] = 7
+        M.response.ui.toc["weather_condition"] = 8
+        M.response.ui.toc["time"] = 9
+        M.response.ui.sensors[4] = {
+            "apiname": "bfp",
+            "default": "true",
+            "group": 99,
+            "longname": "Bearing From Perimeter",
+            "pos": 99,
+            "shortname": "BFP",
+            "vid": 99
+        }
+        M.response.ui.sensors[5] = {
+            "apiname": "dfp",
+            "default": "true",
+            "group": 99,
+            "longname": "Distance From Perimeter",
+            "pos": 99,
+            "shortname": "DFP",
+            "vid": 99
+        }
+        M.response.ui.sensors[6] = {
+            "apiname": "stid",
+            "default": "true",
+            "group": 99,
+            "longname": "Station ID",
+            "pos": 99,
+            "shortname": "STID",
+            "vid": 99
+        }
+        M.response.ui.sensors[7] = {
+            "apiname": "wind_cardinal_direction",
+            "default": "true",
+            "group": 99,
+            "longname": "Wind Cardinal Direction",
+            "pos": 99,
+            "shortname": "WD",
+            "vid": 99
+        }
+        M.response.ui.sensors[8] = {
+            "apiname": "weather_condition",
+            "default": "true",
+            "group": 99,
+            "longname": "Weather Condition",
+            "pos": 99,
+            "shortname": "WC",
+            "vid": 99
+        }
+        M.response.ui.sensors[9] = {
+            "apiname": "time",
+            "default": "true",
+            "group": 99,
+            "longname": "Time From Observation",
+            "pos": 99,
+            "shortname": "TFO",
+            "vid": 99
+        }
         _networkTableEmitter(M, tableArgs);
         _highlightCells(filter);
         _highlightQC(M.response);
-        // d3.select("applyRule").on("click", function () {
-        //     _highlightCells(filter);
-        // })
-
-
     });
     return
 
@@ -149,13 +207,10 @@
             i++;
         }
 
-        // console.log("Sorted stations with most recent ob");
-        // console.log(stations);
-
         // Create and append table to DOM, but first check to see if we have a table node.
         d3.select("body " + args.table_container).selectAll("table").remove();
         var table = d3.select("body " + args.table_container).append("table")
-            .attr("id", args.table_id)
+            .attr("id", args.table_id).classed("table table-condensed", true)
             // .data(headerNames).enter().append("th")
             // Make the header
         table.append("thead").attr("class", "fixed-header").append("tr")
@@ -164,9 +219,56 @@
                 // console.log(i); 
                 return headerNames[i];
             })
+            // .classed("tabtable-header pull-left", true)
+            // .attr("class", function (d) {
+            //     return d.split("_set_")[0];
+            // }, true)
+            // .classed("hidden hidden-sensor", function (d) {
+            //     if (d !== "date_time") {
+            //         var _s = d.split("_set_")[0];
+            //     } else {
+            //         var _s = d[0]
+            //     }
+            //     return !(
+            //         _r.ui.sensors[_r.ui.toc[_s]]
+            //     );
+            // })
             .attr("id", function (d) {
                 return d;
             })
+            // .html(function (d) {
+            //     if (d !== "date_time") {
+            //         var _v = d.split("_set_");
+            //     } else {
+            //         var _v = d
+            //     }
+            //     // Number of similar sensors
+            //     var _n = 1;
+            //     _n = _n === 1 ? "" : " #" + _n;
+            //     // Is variable derived? Look for `d`.
+            //     var _w = typeof _v[1] !== "undefined" && _v[1].split("d").length > 1 ?
+            //         "<sup>&#8226;</sup>" : "";
+            //     d3.select(this).classed("derived-variable", function () {
+            //         return _w === "<sup>&#8226;</sup>" ? true : false;
+            //     });
+            //     // Updated for the UI helper
+            //     console.log(d)
+            //     return d === "date_time" ? "Time" : _r.ui.sensors[_r.ui.toc[_v[0]]].shortname + _w + _n;
+            // })
+            // .on("mouseover", function (d) {
+            //     if (d !== "date_time") {
+            //         $(this).tooltip({
+            //             "title": _fmtSensor(_r.ui.sensors[_r.ui.toc[d.split("_set_")[0]]].longname) +
+            //                 (typeof _s.SENSOR_VARIABLES[d.split("_set_")[0]][d].position === "undefined" ||
+            //                     _s.SENSOR_VARIABLES[d.split("_set_")[0]][d].position === null ?
+            //                     "" :
+            //                     "<br/>Height: " + _s.SENSOR_VARIABLES[d.split("_set_")[0]][d].position + "m"),
+            //             "placement": "top",
+            //             "html": true,
+            //             "container": "body"
+            //         }).tooltip("show");
+            //     }
+            // })
             .classed("table-header", true)
             .property("sorted", false)
             .on('click', function (d) {
@@ -217,6 +319,30 @@
                 return d === "dfp" ? true : false;
             })
 
+        // Add the units to the table. We add this as a `TD` in the `THEAD` node.  If you change 
+        // this to `TH` you will need to update the filtering of `TH` elements in the update 
+        // table width routine.
+        table.select("thead").append("tr")
+            .selectAll("th").data(["stid"].concat(rankedSensors)).enter().append("td")
+            // .attr("id", function (d) {
+            //     return d === "date_time" ? "date-time-locale" : "";
+            // })
+            .classed("tabtable-units", true)
+            // .classed("hidden", function (d) {
+            //     var _s = d.split("_set_")[0];
+            //     return !(
+            //         P.displaySensor(_s) === null ?
+            //             _r.ui.sensors[_r.ui.toc[_s]].default : P.displaySensor(_s)
+            //     );
+            // })
+            .html(function (d) {
+                var _n = 1;
+                return d === "stid" ? null :
+                    typeof U.get(_r.sensor.units[0][d.split("_set_")[0]]).html === "undefined" ?
+                        _r.sensor.units[0][d.split("_set_")[0]] :
+                        U.get(_r.sensor.units[0][d.split("_set_")[0]]).html;
+            })
+            // .on("click", function (d) { _showSettingsModal(d3.select(this).attr("class"), args); });
 
         // Create the rows
         var rows = table.append("tbody").attr("class", "scrollable")
@@ -251,8 +377,6 @@
                 if (d3.select(this).classed("boom") === true || d3.select(this).classed("qcbang")) {
                     if (typeof d.value === "object" && !!d.value[1] && d.name !== "date_time") {
                         var s = "<div class=\"qc-tooltip\"><ul class=\"qc-tooltip\">";
-                        // console.log(_r.qc.metadata[d.value[last]])
-                        // s += "<li>" + _r.qc.metadata[last].NAME + "</li>";
                         d.value[1].forEach(function (_d) {
                             s += "<li>" + _r.qc.metadata[_d].NAME + "</li>";
                         });
@@ -278,7 +402,14 @@
                 var timeNow = String(Date.parse("Nov 29, 2016 01:35:00 UTC")).slice(0, -3);
                 return ((timeNow - d.value) / 60).toFixed(0);
             })
-            // 1480384800
+        //     // Wind Dir
+        // DirTable = ["N","NNE","NE","ENE","E","ESE", "SE","SSE","S","SSW","SW","WSW", "W","WNW","NW","NNW","N"];
+        // if (windDir !== undefined){
+        // r = Math.round(windDir);
+        // windDir= DirTable[Math.floor((r+11.25)/22.5)];
+        // } else {
+        // windDir = 'N/A';
+        // }
     }
 
 
@@ -290,72 +421,67 @@
         //     object in the form:
         //     {selector: {"min": A, max": B}}
         var i = 0;
-        var li = Object.keys(filter).length
+        d3.selectAll("td").classed("bang", function () {
+            return false
+        });
         var key;
-
-        // while (i < li) {
         for (key in Object.keys(filter)) {
             var selector = (Object.keys(filter))[key];
             console.log("Variable selected = " + selector);
             // assign min/max values, test for null
-            var A = typeof filter[selector].min === "undefined" ? null : filter[selector].min;
-            var B = typeof filter[selector].max === "undefined" ? null : filter[selector].max;
-            // var A = typeof filter[selector].min === "undefined" || filter[selector].min === "NaN" ? null : filter[selector].min;
-            // var B = typeof filter[selector].max === "undefined" || filter[selector].max === "NaN" ? null : filter[selector].max;
-            // console.log("Min = " + A);
-            // console.log("Max = " + B);
+            var A = typeof filter[selector].min === "undefined" || filter[selector].min === 0 ? null : filter[
+                selector].min;
+            var B = typeof filter[selector].max === "undefined" || filter[selector].max === 0 ? null : filter[
+                selector].max;
+            console.log("Min = " + A);
+            console.log("Max = " + B);
             if (typeof selector === "undefined") {
                 return false;
             };
             // if (typeof A !== "undefined" || A !== null && typeof B !== "undefined" || B !== null) {
             if (A !== null && B !== null) {
                 // range code, given a min and a max
-                d3.selectAll("." + selector).classed("bang", function () {
+                d3.selectAll('.' + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) > A &&
                         Number(d3.select(this).text()) < B ? true : false;
                 });
                 // } else if (typeof A !== "undefined" || A !== null && typeof B === "undefined" || B === null) {
             } else if (A !== null && B === null) {
                 // greater-than code, min but no max
-                d3.selectAll("." + selector).classed("bang", function () {
+                d3.selectAll('.' + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) > A ? true : false;
                 });
                 // } else if (typeof A === "undefined" || A === null && typeof B !== "undefined" || B !== null) {
             } else if (A === null && B !== null) {
                 // less-than code, max but no min
-                d3.selectAll("." + selector).classed("bang", function () {
+                d3.selectAll('.' + selector).classed("bang", function () {
                     return Number(d3.select(this).text()) < B ? true : false;
                 });
             } else if (A === null && B === null) {
-                // d3.selectAll("td").classed("hide", function(){
-                //     return true
-                // })
-                // return false;
                 continue;
             } else {
                 console.log("Bang! Bang! Something went terribly wrong!")
             };
-            // i++;
         };
+
+        d3.select("tbody").selectAll("td").classed("boom", function (d) {
+            return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
+        })
+        d3.selectAll("td").classed("qcbang", function (d) {
+            if (d3.select(this).classed("boom") === true && d3.select(this).classed("bang") === true) {
+                return true
+            } else {
+                return false
+            }
+        })
     };
+
 
     /**
      * Highlights Cells based on API QC flags
      * @param {object} API response
      */
     function _highlightQC(object) {
-        // var _r = M.response;
-        // var _s = _r.station;
-        // var qcFlagged = [];
-        // var i;
-        // for (i in _s) {
-        //     if (_s[i]["QC_FLAGGED"] == true) {
-        //         qcFlagged.push(_s[i]["STID"]);
-
-        //     } else {
-        //         continue;
-        //     }
-        // }
         d3.selectAll("td").classed("boom", function (d) {
             return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
         })
@@ -368,11 +494,15 @@
         })
     }
 
-    // function _exclusions(checkbox) {
-    //     d3.selectAll("tr").classed("hide", function () {
-    //         if (d3.select(this).classed("boom") !== true || d3.select(this).classed("bang") !== true || d3.select(this).classed("qcbang") !== true) {
-    //             return checkbox.checked ? true : false;
-    //         }
-    //     })
-    // }
+    /**
+     * Pretty formatter for defaulted Mesonet API sensor names
+     * @param a {string} - sensor name
+     */
+    function _fmtSensor(a) {
+        return (typeof a !== "string" || a.split("_").length === 1) ? a :
+            a.split("_").map(function (d) {
+                return d.charAt(0).toUpperCase() + d.slice(1);
+            }).join(" ");
+    }
+
 })();
