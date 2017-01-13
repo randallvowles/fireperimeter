@@ -27,7 +27,7 @@
         table_class: "",
         sensors: rankedSensors
     };
-    var headerNames = ["Station ID", "Distance From Fire Perimeter", "Bearing To Fire Perimeter",
+    var headerNames = ["Station ID", "Distance To Fire Perimeter", "Bearing To Fire Perimeter",
         "Time From Observation", "Air Temperature", "Relative Humidity",
         "Wind Speed", "Wind Gust", "Wind Direction", "Weather Condition"
     ];
