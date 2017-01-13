@@ -51,8 +51,9 @@
         //timestamp and map function
         M.response.sensor.units[0].bfp = "Degrees"
         M.response.sensor.units[0].dfp = "Statute miles"
-        M.response.sensor.units[0].time = "Minutes"
-        M.response.sensor.units[0].wind_direction = "Code"
+        M.response.sensor.units[0].date_time = "Minutes"
+        M.response.sensor.units[0].wind_direction = "code"
+        M.response.sensor.units[0].weather_condition = "code"
         M.response.ui.toc["bfp"] = 4
         M.response.ui.toc["dfp"] = 5
         M.response.ui.toc["stid"] = 6
@@ -165,8 +166,6 @@
             var tmp = {};
             tmp.stid = _s[i].STID;
             rankedSensors.map(function (d) {
-                    // console.log(i)
-                    // console.log(stidAndDist[i][0])
                     // Best to use terinary logic here, but for simplicity...
                     if (d === "dfp") {
                         tmp[d] = [stidAndDist[i][0]];
@@ -219,20 +218,6 @@
                 // console.log(i); 
                 return headerNames[i];
             })
-            // .classed("tabtable-header pull-left", true)
-            // .attr("class", function (d) {
-            //     return d.split("_set_")[0];
-            // }, true)
-            // .classed("hidden hidden-sensor", function (d) {
-            //     if (d !== "date_time") {
-            //         var _s = d.split("_set_")[0];
-            //     } else {
-            //         var _s = d[0]
-            //     }
-            //     return !(
-            //         _r.ui.sensors[_r.ui.toc[_s]]
-            //     );
-            // })
             .attr("id", function (d) {
                 return d;
             })
@@ -281,10 +266,10 @@
                 if (_thisId === "stid") {
                     rows.sort(function (a, b) {
                         return _state ? b.stid.localeCompare(a.stid) : a.stid.localeCompare(b.stid);
-                    }); // if (_thisId !== "date_time")
+                    });
                 } else {
                     rows.sort(function (a, b) {
-                        // Typeguarding for null values.                   
+                        // Typeguarding for null values.
                         var _a = a[d] === null ? -9999 : typeof a[d] === "object" ? a[d][0] : a[d];
                         var _b = b[d] === null ? -9999 : typeof b[d] === "object" ? b[d][0] : b[d];
                         return _state ? _a - _b : _b - _a;
@@ -324,25 +309,14 @@
         // table width routine.
         table.select("thead").append("tr")
             .selectAll("th").data(["stid"].concat(rankedSensors)).enter().append("td")
-            // .attr("id", function (d) {
-            //     return d === "date_time" ? "date-time-locale" : "";
-            // })
             .classed("tabtable-units", true)
-            // .classed("hidden", function (d) {
-            //     var _s = d.split("_set_")[0];
-            //     return !(
-            //         P.displaySensor(_s) === null ?
-            //             _r.ui.sensors[_r.ui.toc[_s]].default : P.displaySensor(_s)
-            //     );
-            // })
             .html(function (d) {
                 var _n = 1;
                 return d === "stid" ? null :
                     typeof U.get(_r.sensor.units[0][d.split("_set_")[0]]).html === "undefined" ?
-                        _r.sensor.units[0][d.split("_set_")[0]] :
-                        U.get(_r.sensor.units[0][d.split("_set_")[0]]).html;
+                    _r.sensor.units[0][d.split("_set_")[0]] :
+                    U.get(_r.sensor.units[0][d.split("_set_")[0]]).html;
             })
-            // .on("click", function (d) { _showSettingsModal(d3.select(this).attr("class"), args); });
 
         // Create the rows
         var rows = table.append("tbody").attr("class", "scrollable")
@@ -350,11 +324,20 @@
         // Create and populate the cells
         var cells = rows.selectAll('td')
             .data(function (row) {
+                
                 return ["stid"].concat(rankedSensors).map(function (d) {
-                    return {
-                        name: d,
-                        value: row[d] === null ? "" : row[d],
-                    };
+                    if (d !== "wind_direction") {
+                        return {
+                            name: d,
+                            value: row[d] === null ? "" : row[d],
+                        };
+                    } else if (d === "wind_direction") {
+                        return {
+                            name: d,
+                            value: row[d] === null ? "" : row[d],
+                            text: _fmtWindDirection(row[d][0])
+                        }
+                    }
                 });
             })
             .enter().append("td")
@@ -366,7 +349,7 @@
                 var _p = typeof _r.sensor.units[0][d.name.split("_set_")[0]] === "undefined" ?
                     2 : U.get(_r.sensor.units[0][d.name.split("_set_")[0]]).precision;
                 return d.name === "date_time" ?
-                    d.value : typeof _v === "number" ? Number(_v).toFixed(_p) : _v;
+                    d.value : d.name ==="wind_direction" ? d.text : typeof _v === "number" ? Number(_v).toFixed(_p) : _v;
                 // return d.value;
             })
             .attr("class", function (d) {
@@ -374,7 +357,7 @@
             })
             .on("mouseover", function (d) {
                 // Call Bootstrap tooltip, this is one of the few jQuery dependencies
-                if (d3.select(this).classed("boom") === true || d3.select(this).classed("qcbang")) {
+                if (d3.select(this).classed("boom") === true || d3.select(this).classed("qcbang") === true) {
                     if (typeof d.value === "object" && !!d.value[1] && d.name !== "date_time") {
                         var s = "<div class=\"qc-tooltip\"><ul class=\"qc-tooltip\">";
                         d.value[1].forEach(function (_d) {
@@ -382,15 +365,28 @@
                         });
                         s += "</ul></div>";
                         $(this).tooltip({
-                            "title": "Observations has QC Flag: " + s,
+                            "title": "Observation has QC Flag: " + s,
                             "placement": "top",
                             "html": true,
                             "container": "body"
                         }).tooltip("show");
+
+                        // } else if (d.name === "wind_direction") {
+                        //     var s = "<div class=\"qc-tooltip\"><ul class=\"qc-tooltip\">";
+                        //     s += "<li>" + _r.qc.metadata[d.text[1]].NAME + "</li>";
+                        //     // d.value[1].forEach(function (_d) {
+                        //     //     s += "<li>" + _r.qc.metadata[_d].NAME + "</li>";
+                        //     // });
+                        //     s += "</ul></div>";
+                        //     $(this).tooltip({
+                        //         "title": "Observations has QC Flag: " + s,
+                        //         "placement": "top",
+                        //         "html": true,
+                        //         "container": "body"
+                        //     }).tooltip("show");
                     }
                 }
             })
-
 
         var hyperlink = d3.selectAll(".stid")
             .on("click", function () {
@@ -402,14 +398,20 @@
                 var timeNow = String(Date.parse("Nov 29, 2016 01:35:00 UTC")).slice(0, -3);
                 return ((timeNow - d.value) / 60).toFixed(0);
             })
-        //     // Wind Dir
-        // DirTable = ["N","NNE","NE","ENE","E","ESE", "SE","SSE","S","SSW","SW","WSW", "W","WNW","NW","NNW","N"];
-        // if (windDir !== undefined){
-        // r = Math.round(windDir);
-        // windDir= DirTable[Math.floor((r+11.25)/22.5)];
-        // } else {
-        // windDir = 'N/A';
-        // }
+            // var cardWD = d3.select("tbody").selectAll(".wind_direction")
+            //     .text(function (d) {
+            //         if (typeof d !== undefined) {
+            //             d.text = d.value
+            //             var DirTable = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"];
+            //             var r = Math.round(parseInt(d.value));
+            //             var _c = DirTable[Math.floor((r + 11.25) / 22.5)];
+            //             // console.log(d)
+            //             // console.log(d.value)
+            //             return d.value = _c
+            //         } else {
+            //             return ""
+            //         }
+            //     })
     }
 
 
@@ -482,7 +484,7 @@
      * @param {object} API response
      */
     function _highlightQC(object) {
-        d3.selectAll("td").classed("boom", function (d) {
+        d3.select("tbody").selectAll("td").classed("boom", function (d) {
             return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
         })
         d3.selectAll("td").classed("qcbang", function (d) {
@@ -494,6 +496,7 @@
         })
     }
 
+
     /**
      * Pretty formatter for defaulted Mesonet API sensor names
      * @param a {string} - sensor name
@@ -504,5 +507,21 @@
                 return d.charAt(0).toUpperCase() + d.slice(1);
             }).join(" ");
     }
+
+    /**
+     * Converts wind direction value from degrees to cardinal direction
+     * @param a {number} - wind direction (degrees)
+     */
+    function _fmtWindDirection(b) {
+        if (typeof b !== undefined) {
+            var DirTable = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"];
+            var r = Math.round(parseInt(b));
+            var _c = DirTable[Math.floor((r + 11.25) / 22.5)];
+            return _c
+        } else {
+            return ""
+        }
+    }
+
 
 })();
