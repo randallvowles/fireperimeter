@@ -24,7 +24,7 @@
         }
         
         .qcbang {
-            background: repeating-linear-gradient(-65deg, red, red 45px, yellow 45px, yellow 65px);
+            background: repeating-linear-gradient(-60deg, red, red 25px, yellow 25px, yellow 50px);
             font-weight: bold;
             border: 1px solid black !important;
             text-align: center;
@@ -63,17 +63,11 @@
                         <h1>Monitoring Weather Conditions Near Wildfires</h1>
                     </p>
                     <hr/>
-                    <p>
-                        To filter the results either enter the range for each parameter, enter the min field to create a greater-than parameter (leave
-                        the max blank), or create a less-than parameter by entering the max (leave the min blank).
-                    </p>
-                    <p>
-                        Clicking on the Station ID will take you to the MesoWest page for that station, where you can access graphical displays,
-                        timeseries data from all sensors, and additional metadata.
-                    </p>
-                    <p>
-                        Cells highlighted yellow indicate a QC flag associated with that observation, hover over the cell for the QC flag description.
-                    </p>
+                   <p>
+                       ** This web page is a static demo for the Chimney Top 2 fire (Gatlinburg, TN) **
+                   </p>
+                   <p>
+                       For more information and help with this page, click <a href="http://home.chpc.utah.edu/~u0540701/fireperimeter/help.html">here</a>.
                     <hr/>
                     <h4>Current time: Nov 29 2016 01:35:00 UTC</h4>
                     <hr/>
@@ -97,18 +91,23 @@
                 <!--<label>Wind Direction - </label>
         <label>Min: <input type="text" maxlength=3 id="minValueWD"></label>
         <label>Max: <input type="text" maxlength=3 id="maxValueWD"></label></br>-->
-        <hr/>
+                <hr/>
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-default" onclick=_applyRule()>Apply</button>
                     <button type="button" class="btn btn-default" onclick=_updateURL()>Apply & Update URL</button>
                 </div>
                 <hr/>
-                <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" onclick="_exclusions(this);"></label><hr/>
+                <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" onclick="_exclusions(this);"></label>
+                <hr/>
             </div>
             <div class="col-sm-12 col-md-10">
                 <div class="table-responsive">
                     <div id="nettable-container"></div>
                 </div>
+            </div>
+            <hr/>
+            <div class="col-sm-12 col-md-12 footer">
+                Page created by Randall Vowles 2016-2017, send all questions or comments to randall.vowles@utah.edu
             </div>
 </body>
 <script type="text/javascript">
