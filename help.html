@@ -32,6 +32,14 @@
                 <div>
                     <h4>How It Works</h4>
                     <p>
+                        Using Python, this web application first gets information regarding all Wildfires within the United States from the <a href"http://rmgsc.cr.usgs.gov/outgoing/GeoMAC/">GeoMAC</a>
+                        database. The file is parsed to gather all relevant data and save it as a JSON dictionary. Before the file is made available for the webpage, a query is made
+                        using the <a href"https://synopticlabs.org/api/mesonet/">MesoWest/Synoptic Labs API</a> to find all weather stations within a large radius from the fire's center. 
+                    </p>
+                    <p>
+                        The rest of the process uses JavaScript to load the JSON dictionary, query the MesoWest/Synoptic Labs API again for all recent weather
+                        observations surrounding the fire, and then load formats and loads that data into a simple, easy-to-read table. The table uses <a href"https://d3js.org/">d3.js</a>,
+                        a JavaScript library, to provide several tools for highlighting user-selected observation parameters to make it easy to see only those values that are of importance. 
                     </p>
                 </div>
                 <div>
