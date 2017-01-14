@@ -19,43 +19,68 @@
                     </p>
                     <hr/>
                     <p>
-                        This page will provide an introduction and background information for the creation of this web application.
-                        Additionally, an explanation on how to use all of the features of this application is listed below.
+                        This page will provide an introduction and background information for the creation of this web application. Additionally,
+                        an explanation on how to use all of the features of this application is listed below.
                     </p>
                     </hr>
                 </article>
                 <div>
                     <h4>Introduction</h4>
                     <p>
+                        Due to the dangerous and highly susceptible nature of wildland fires to change and threaten lives and property, it is critical
+                        to monitor and be aware of conditions surrounding these wildfires. The vulnerability of fire-fighting
+                        personnel and the public to changing weather conditions near wildfires necessitates improved monitoring
+                        of those meteorological conditions around the nation. As part of the National Mesonet Program of
+                        the National Weather Service, SynopticLabs/MesoWest provides access to weather observations from
+                        over 30,000 locations that are made available by hundreds of data providers (https://synopticlabs.org).
+                        Federal and state agencies most responsible for fighting wildfires support the Remote Automated Weather
+                        Station (RAWS) network to monitor conditions in fire prone areas nationwide while the National Weather
+                        Service often deploys portable RAWS stations as part of fire suppression operations. Improving access
+                        to RAWS and other observations in intuitive web displays is critical for improved situational awareness.
+                        To acquire the necessary data, basic fire metadata from GeoMAC is downloaded and archived. Using
+                        that metadata, the Synoptic Labs Mesonet API (synopticlabs.org/api) is queried to obtain the IDs,
+                        coordinates, and distance from fires for all nearby weather stations. Of particular interest is to
+                        provide web-based displays that help alert fire personnel and the public to weather conditions that
+                        are defined by them to be critical to monitor, e.g., user-selectable changes in winds, temperature,
+                        moisture, or weather conditions. 
                     </p>
                 </div>
                 <div>
                     <h4>How It Works</h4>
                     <p>
-                        Using Python, this web application first gets information regarding all Wildfires within the United States from the <a href"http://rmgsc.cr.usgs.gov/outgoing/GeoMAC/">GeoMAC</a>
-                        database. The file is parsed to gather all relevant data and save it as a JSON dictionary. Before the file is made available for the webpage, a query is made
-                        using the <a href"https://synopticlabs.org/api/mesonet/">MesoWest/Synoptic Labs API</a> to find all weather stations within a large radius from the fire's center. 
+                        Using Python, this web application first gets information regarding all Wildfires within the United States from the
+                        <a
+                            href "http://rmgsc.cr.usgs.gov/outgoing/GeoMAC/">GeoMAC</a>
+                            database. The file is parsed to gather all relevant data and save it as a JSON dictionary. Before the file is made available
+                            for the webpage, a query is made using the <a href
+                                "https://synopticlabs.org/api/mesonet/">MesoWest/Synoptic Labs API</a> to find all weather stations within a large radius from the
+                            fire's center.
                     </p>
                     <p>
-                        The rest of the process uses JavaScript to load the JSON dictionary, query the MesoWest/Synoptic Labs API again for all recent weather
-                        observations surrounding the fire, and then load formats and loads that data into a simple, easy-to-read table. The table uses <a href"https://d3js.org/">d3.js</a>,
-                        a JavaScript library, to provide several tools for highlighting user-selected observation parameters to make it easy to see only those values that are of importance. 
+                        The rest of the process uses JavaScript to load the JSON dictionary, query the MesoWest/Synoptic Labs API again for all recent
+                        weather observations surrounding the fire, and then format and load that data into a simple, easy-to-read
+                        table. The table uses <a href "https://d3js.org/">d3.js</a>, a JavaScript
+                        library, to quickly select and highlight data according to user-selected observation parameters,
+                        to make it easy to see only those values that are of importance.
                     </p>
                 </div>
                 <div>
                     <h4>Using the Webpage</h4>
-                     <p>
+                    <p>
                         To filter the results either enter the range for each parameter, enter the min field to create a greater-than parameter (leave
-                        the max blank), or create a less-than parameter by entering the max (leave the min blank). CLicking "Apply" will instantly apply the
-                        filter(s) to the table. However, clicking "Apply & Update URL" will add the parameters to the URL so you can bookmark the
-                        link and save your chosen parameters.
+                        the max blank), or create a less-than parameter by entering the max (leave the min blank). CLicking
+                        "Apply" will instantly apply the filter(s) to the table. However, clicking "Apply & Update URL" will
+                        add the parameters to the URL so you can bookmark the link and save your chosen parameters.
                     </p>
                     <p>
-                        Clicking on the Station ID will take you to the MesoWest tabular page for that station, From that page, the sidebar on the left can provide links to view graphical 
-                        displays of any variable, change the date and time of displayed data, download data from any time range and any observation variables, and to view the station on a map.
+                        Clicking on the Station ID will take you to the MesoWest tabular page for that station, From that page, the sidebar on the
+                        left can provide links to view graphical displays of any variable, change the date and time of displayed
+                        data, download data from any time range and any observation variables, and to view the station on
+                        a map.
                     </p>
                     <p>
-                        Cells highlighted yellow indicate that a QC flag is associated with that observation. To view what the QC flag is for, hover over the cell for the flag description.
-                        To preserve QC flags even as cells are highlighted for falling into a chosen range, the cell will highlight red with a yellow stripe.
+                        Cells highlighted yellow indicate that a QC flag is associated with that observation. To view what the QC flag is for, hover
+                        over the cell for the flag description. To preserve QC flags even as cells are highlighted for falling
+                        into a chosen range, the cell will highlight red with a yellow stripe.
                     </p>
                 </div>
