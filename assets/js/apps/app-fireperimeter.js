@@ -360,20 +360,6 @@
                             "html": true,
                             "container": "body"
                         }).tooltip("show");
-
-                        // } else if (d.name === "wind_direction") {
-                        //     var s = "<div class=\"qc-tooltip\"><ul class=\"qc-tooltip\">";
-                        //     s += "<li>" + _r.qc.metadata[d.text[1]].NAME + "</li>";
-                        //     // d.value[1].forEach(function (_d) {
-                        //     //     s += "<li>" + _r.qc.metadata[_d].NAME + "</li>";
-                        //     // });
-                        //     s += "</ul></div>";
-                        //     $(this).tooltip({
-                        //         "title": "Observations has QC Flag: " + s,
-                        //         "placement": "top",
-                        //         "html": true,
-                        //         "container": "body"
-                        //     }).tooltip("show");
                     }
                 }
             })
@@ -388,20 +374,6 @@
                 var timeNow = String(Date.parse("Nov 29, 2016 01:35:00 UTC")).slice(0, -3);
                 return ((timeNow - d.value) / 60).toFixed(0);
             })
-            // var cardWD = d3.select("tbody").selectAll(".wind_direction")
-            //     .text(function (d) {
-            //         if (typeof d !== undefined) {
-            //             d.text = d.value
-            //             var DirTable = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"];
-            //             var r = Math.round(parseInt(d.value));
-            //             var _c = DirTable[Math.floor((r + 11.25) / 22.5)];
-            //             // console.log(d)
-            //             // console.log(d.value)
-            //             return d.value = _c
-            //         } else {
-            //             return ""
-            //         }
-            //     })
     }
 
 
