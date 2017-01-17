@@ -24,7 +24,7 @@
         }
         
         .qcbang {
-            background: repeating-linear-gradient(-60deg, red, red 25px, yellow 25px, yellow 50px);
+            background: repeating-linear-gradient(-60deg, red, red 30px, yellow 30px, yellow 55px);
             font-weight: bold;
             border: 1px solid black !important;
             text-align: center;
@@ -63,14 +63,14 @@
                         <h1>Monitoring Weather Conditions Near Wildfires</h1>
                     </p>
                     <hr/>
-                   <p>
-                       Currently in DEMO mode, showing the Chimney Top 2 fire (Gatlinburg, TN).
-                   </p>
-                   <p>
-                       For an introduction and more information on this page, click <a href="http://home.chpc.utah.edu/~u0540701/fireperimeter/help.html">here</a>.
-                    <hr/>
-                    <h4>Current time: Nov 29 2016 01:35:00 UTC</h4>
-                    <hr/>
+                    <p>
+                        Currently in DEMO mode, showing the Chimney Top 2 Fire (Gatlinburg, TN).
+                    </p>
+                    <p>
+                        For an introduction and more information on this page, click <a href="http://home.chpc.utah.edu/~u0540701/fireperimeter/help.html">here</a>.
+                        <hr/>
+                        <h4>Current time: Nov 29 2016 01:35:00 UTC</h4>
+                        <hr/>
                 </article>
             </div>
         </div>
@@ -261,7 +261,11 @@
             };
         };
         d3.selectAll("td").classed("boom", function (d) {
-            return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
+            try {
+                return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
+            } catch (e) {
+                console.log(d.value)
+            }
         })
         d3.selectAll("td").classed("qcbang", function (d) {
             if (d3.select(this).classed("boom") === true && d3.select(this).classed("bang") === true) {
