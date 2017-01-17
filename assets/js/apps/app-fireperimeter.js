@@ -57,9 +57,8 @@
         M.response.ui.toc["bfp"] = 4
         M.response.ui.toc["dfp"] = 5
         M.response.ui.toc["stid"] = 6
-        M.response.ui.toc["wind_cardinal_direction"] = 7
-        M.response.ui.toc["weather_condition"] = 8
-        M.response.ui.toc["time"] = 9
+        M.response.ui.toc["weather_condition"] = 7
+        M.response.ui.toc["time"] = 8
         M.response.ui.sensors[4] = {
             "apiname": "bfp",
             "default": "true",
@@ -88,15 +87,6 @@
             "vid": 99
         }
         M.response.ui.sensors[7] = {
-            "apiname": "wind_cardinal_direction",
-            "default": "true",
-            "group": 99,
-            "longname": "Wind Cardinal Direction",
-            "pos": 99,
-            "shortname": "WD",
-            "vid": 99
-        }
-        M.response.ui.sensors[8] = {
             "apiname": "weather_condition",
             "default": "true",
             "group": 99,
@@ -105,7 +95,7 @@
             "shortname": "WC",
             "vid": 99
         }
-        M.response.ui.sensors[9] = {
+        M.response.ui.sensors[8] = {
             "apiname": "time",
             "default": "true",
             "group": 99,
@@ -171,7 +161,7 @@
                         tmp[d] = [stidAndDist[i][0]];
                     } else if (d === "bfp") {
                         tmp[d] = [stidAndDist[i][1]];
-                    } else if (d === "weather_condition" || d === "wind_cardinal_direction") {
+                    } else if (d === "weather_condition") {
                         try {
                             tmp[d] = [_s[i].OBSERVATIONS[d + "_set_1d"][last]] // add to include cardinal direction
                         } catch (e) {
@@ -324,7 +314,7 @@
         // Create and populate the cells
         var cells = rows.selectAll('td')
             .data(function (row) {
-                
+
                 return ["stid"].concat(rankedSensors).map(function (d) {
                     if (d !== "wind_direction") {
                         return {
@@ -349,7 +339,7 @@
                 var _p = typeof _r.sensor.units[0][d.name.split("_set_")[0]] === "undefined" ?
                     2 : U.get(_r.sensor.units[0][d.name.split("_set_")[0]]).precision;
                 return d.name === "date_time" ?
-                    d.value : d.name ==="wind_direction" ? d.text : typeof _v === "number" ? Number(_v).toFixed(_p) : _v;
+                    d.value : d.name === "wind_direction" ? d.text : typeof _v === "number" ? Number(_v).toFixed(_p) : _v;
                 // return d.value;
             })
             .attr("class", function (d) {
@@ -467,7 +457,11 @@
         };
 
         d3.select("tbody").selectAll("td").classed("boom", function (d) {
-            return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
+            try {
+                return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
+            } catch (e) {
+                console.log(d.value)
+            }
         })
         d3.selectAll("td").classed("qcbang", function (d) {
             if (d3.select(this).classed("boom") === true && d3.select(this).classed("bang") === true) {

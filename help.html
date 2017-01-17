@@ -22,10 +22,12 @@
                         This page will provide an introduction and background information for the creation of this web application. Additionally,
                         an explanation on how to use all of the features of this application is listed below.
                     </p>
-                    </hr>
+                    
                 </article>
                 <div>
+                    
                     <h4>Introduction</h4>
+
                     <p>
                         Due to the dangerous and highly susceptible nature of wildland fires to change and threaten lives and property, it is critical
                         to monitor and be aware of conditions surrounding these wildfires. The vulnerability of fire-fighting
@@ -33,8 +35,7 @@
                         of those meteorological conditions around the nation.
                     </p>
                     <p>
-                        As part of the National Mesonet Program of the National Weather Service, <a href
-                            "https://synopticlabs.org">SynopticLabs/MesoWest</a> provides access to weather observations from over 30,000 locations that
+                        As part of the National Mesonet Program of the National Weather Service, <a href="https://synopticlabs.org">SynopticLabs/MesoWest</a> provides access to weather observations from over 30,000 locations that
                         are made available by hundreds of data providers. Federal and state agencies most responsible for
                         fighting wildfires support the Remote Automated Weather Station (RAWS) network to monitor conditions
                         in fire prone areas nationwide, while the National Weather Service often deploys portable RAWS stations
@@ -42,31 +43,37 @@
                         web displays is critical for improved situational awareness.
                     </p>
                     <p>
-                        MesoWest currently has a <a href"http://mesowest.utah.edu/fire.html">web application</a> that allows weather conditions around fires
+                        MesoWest currently has a <a href="http://mesowest.utah.edu/fire.html">web application</a> that allows weather conditions around fires
                         to be viewed. However, because this web page relies on outdated code and processes, a new web application is now desired.
-                        
+                        </hr>
                         </p>
                 </div>
+                
                 <div>
+
                     <h4>How It Works</h4>
                     <p>
-                        Using Python, this web application first gets information regarding all Wildfires within the United States from the
-                        <a href "http://rmgsc.cr.usgs.gov/outgoing/GeoMAC/">GeoMAC</a> database. The file is parsed to gather
+                        This web application first gets current information regarding all Wildfires within the United States from the
+                        <a href="http://rmgsc.cr.usgs.gov/outgoing/GeoMAC/">GeoMAC</a> database. The file is parsed, using Python, to gather
                         all relevant data and save it as a JSON dictionary. Before the file is made available for the webpage,
-                        a query is made using the <a href "https://synopticlabs.org/api/mesonet/">MesoWest/Synoptic Labs API</a>
+                        a query is made using the <a href="https://synopticlabs.org/api/mesonet/">MesoWest/Synoptic Labs API</a>
                         to find all weather stations within a large radius from the fire's center.
                     </p>
                     <p>
                         The rest of the process uses JavaScript to load the JSON dictionary, query the MesoWest/Synoptic Labs API again for all recent
                         weather observations surrounding the fire, and then format and load that data into a simple, easy-to-read
-                        table. The table uses <a href "https://d3js.org/">d3.js</a>, a JavaScript
+                        table. The table uses <a href="https://d3js.org/">d3.js</a>, a JavaScript
                         library, to quickly select and highlight data according to user-selected observation parameters,
                         to make it easy to see only those values that are of importance.
+                        </hr>
                     </p>
                 </div>
+                
                 <div>
+                    
                     <h4>Using the Webpage</h4>
                     <p>
+                        
                         To filter the results either enter the range for each parameter, enter the min field to create a greater-than parameter (leave
                         the max blank), or create a less-than parameter by entering the max (leave the min blank). CLicking
                         "Apply" will instantly apply the filter(s) to the table. However, clicking "Apply & Update URL" will
@@ -80,7 +87,11 @@
                     </p>
                     <p>
                         Cells highlighted yellow indicate that a QC flag is associated with that observation. To view what the QC flag is for, hover
-                        over the cell for the flag description. To preserve QC flags even as cells are highlighted for falling
+                        over the cell for the flag description. To preserve QC flags as cells are highlighted for falling
                         into a chosen range, the cell will highlight red with a yellow stripe.
+                        </hr>
+                    </p>
+                    <p>
+
                     </p>
                 </div>
