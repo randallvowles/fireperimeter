@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    var APITOKEN = "demotoken"
+    var APITOKEN = "c5213a1102b8422c80378944e1246d10"
 
     var M = new Mesonet({
         token: APITOKEN,
@@ -122,7 +122,8 @@
         var U = new Units();
 
         var rankedSensors = args.sensors;
-        var baseURL = ["http://mesowest.utah.edu/cgi-bin/droman/meso_base_dyn.cgi?stn="]
+        // var baseURL = ["http://mesowest.utah.edu/cgi-bin/droman/meso_base_dyn.cgi?stn="];
+        var new_baseURL = ["https://synopticlabs.org/demos/qc/tabtable.html?override_units=1&units=english,speed|mph&recent=1440&stid="];
             // Insert the `date_time` value into `rankedSensors`, we do this to make sure 
             // we generate the table correctly.  We also want an array to put our sorted keys
             // back in to.  Once the sensors are ranked, we will create a sorted output that
@@ -366,7 +367,8 @@
 
         var hyperlink = d3.selectAll(".stid")
             .on("click", function () {
-                window.open(baseURL + d3.select(this).text());
+                // window.open(baseURL + d3.select(this).text());
+                window.open(new_baseURL + d3.select(this).text());
             });
         var timeConversion = d3.selectAll(".date_time")
             .text(function (d) {
