@@ -89,6 +89,7 @@
 
     $.when(HTTPFetch(state.baseUrl + state.thisJSONFile, printFetchResponse)).done(function () {
         var current_json = json_total;
+        console.log(current_json);
         var key;
         for (key in current_json[fireID][nearest_stations]) {
             stidStack.push(current_json[fireID][nearest_stations][key]["STID"]);
