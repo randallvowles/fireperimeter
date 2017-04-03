@@ -39,7 +39,7 @@
         baseUrl: 'http://home.chpc.utah.edu/~u0540701/storage/fire_data/',
         thisJSONFile: "AF_NS_current.json"
     }
-
+    var json_total = []
     function HTTPFetch(url, callback) {
         var request = new XMLHttpRequest();
         request.open("GET", url)
@@ -52,7 +52,6 @@
         request.send(null);
     }
     function printResponse(a) {
-        var current_json = a
         console.log('URL To Fetch')
         console.log(state.baseUrl + state.thisJSONFile)
         console.log(a)
@@ -85,11 +84,11 @@
     var fireID = windowURL.fire;
 
     HTTPFetch(state.baseUrl + state.thisJSONFile, printResponse)
-
+    var current_json = json_total;
     var key;
     for (key in current_json.fireID.nearest_stations) {
         stidStack.push(current_json.fireID.nearest_stations[key]["STID"]);
-        stidAndDist.push(ccurrent_json.fireID.nearest_stations[key]["DFP"]);
+        stidAndDist.push(current_json.fireID.nearest_stations[key]["DFP"]);
     };
 
     var stidList = stidStack.join(",");
