@@ -87,20 +87,19 @@
     var fireID = windowURL.fire;
     console.log(fireID);
 
-    $.when(HTTPFetch(state.baseUrl + state.thisJSONFile, printFetchResponse)).done(function () {
-        var current_json = json_total;
-        console.log(current_json);
-        var key;
-        for (key in current_json[fireID][nearest_stations]) {
-            stidStack.push(current_json[fireID][nearest_stations][key]["STID"]);
-            stidAndDist.push(current_json[fireID][nearest_stations][key]["DFP"]);
-        };
+    HTTPFetch(state.baseUrl + state.thisJSONFile, printFetchResponse);
+    var current_json = json_total;
+    console.log(current_json);
+    var key;
+    for (key in current_json[fireID][nearest_stations]) {
+        stidStack.push(current_json[fireID][nearest_stations][key]["STID"]);
+        stidAndDist.push(current_json[fireID][nearest_stations][key]["DFP"]);
+    };
 
-        var stidList = stidStack.join(",");
-        apiArgs.stid = stidList;
-        M.fetch({
-            api_args: apiArgs
-        });
+    var stidList = stidStack.join(",");
+    apiArgs.stid = stidList;
+    M.fetch({
+        api_args: apiArgs
         var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
         // console.log(filter)
         M.printResponse();
