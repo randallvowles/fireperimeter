@@ -88,8 +88,8 @@
 
     var key;
     for (key in current_json.fireID.nearest_stations) {
-        stidStack.push(chimney_top50.fireID.nearest_stations[key]["STID"]);
-        stidAndDist.push(chimney_top50.fireID.nearest_stations[key]["DFP"]);
+        stidStack.push(current_json.fireID.nearest_stations[key]["STID"]);
+        stidAndDist.push(ccurrent_json.fireID.nearest_stations[key]["DFP"]);
     };
 
     var stidList = stidStack.join(",");
