@@ -40,6 +40,7 @@
         thisJSONFile: "AF_NS_current.json"
     }
     var json_total = []
+
     function HTTPFetch(url, callback) {
         var request = new XMLHttpRequest();
         request.open("GET", url)
@@ -51,11 +52,13 @@
         }
         request.send(null);
     }
-    function printResponse(a) {
+
+    function printFetchResponse(a) {
         console.log('URL To Fetch')
         console.log(state.baseUrl + state.thisJSONFile)
         console.log(a)
     }
+
     function getWindowArgs() {
         var a = {};
         var b = window.location.search.substring(1).split("&");
@@ -83,22 +86,23 @@
     var windowURL = getWindowArgs();
     var fireID = windowURL.fire;
 
-    HTTPFetch(state.baseUrl + state.thisJSONFile, printResponse)
-    var current_json = json_total;
-    var key;
-    for (key in current_json.fireID.nearest_stations) {
-        stidStack.push(current_json.fireID.nearest_stations[key]["STID"]);
-        stidAndDist.push(current_json.fireID.nearest_stations[key]["DFP"]);
-    };
+    $.when(HTTPFetch(state.baseUrl + state.thisJSONFile, printFetchResponse)).done(function () {
+        var current_json = json_total;
+        var key;
+        for (key in current_json.fireID.nearest_stations) {
+            stidStack.push(current_json.fireID.nearest_stations[key]["STID"]);
+            stidAndDist.push(current_json.fireID.nearest_stations[key]["DFP"]);
+        };
 
-    var stidList = stidStack.join(",");
-    apiArgs.stid = stidList;
-    M.fetch({
-        api_args: apiArgs
-    });
-    var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
-    // console.log(filter)
-    M.printResponse();
+        var stidList = stidStack.join(",");
+        apiArgs.stid = stidList;
+        M.fetch({
+            api_args: apiArgs
+        });
+        var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
+        // console.log(filter)
+        M.printResponse();
+    })
     $.when(M.async()).done(function () {
         //timestamp and map function
         M.response.sensor.units[0].bfp = "Degrees"
@@ -176,10 +180,10 @@
         var rankedSensors = args.sensors;
         // var baseURL = ["http://mesowest.utah.edu/cgi-bin/droman/meso_base_dyn.cgi?stn="];
         var new_baseURL = ["https://synopticlabs.org/demos/qc/tabtable.html?override_units=1&units=english,speed|mph&recent=1440&stid="];
-            // Insert the `date_time` value into `rankedSensors`, we do this to make sure 
-            // we generate the table correctly.  We also want an array to put our sorted keys
-            // back in to.  Once the sensors are ranked, we will create a sorted output that
-            // will be ready to generate a table from.
+        // Insert the `date_time` value into `rankedSensors`, we do this to make sure 
+        // we generate the table correctly.  We also want an array to put our sorted keys
+        // back in to.  Once the sensors are ranked, we will create a sorted output that
+        // will be ready to generate a table from.
         rankedSensors.splice(0, 0, "dfp")
         rankedSensors.splice(1, 0, "bfp")
         rankedSensors.splice(2, 0, "date_time")
@@ -209,43 +213,43 @@
             var tmp = {};
             tmp.stid = _s[i].STID;
             rankedSensors.map(function (d) {
-                    // Best to use terinary logic here, but for simplicity...
-                    if (d === "dfp") {
-                        tmp[d] = [stidAndDist[i][0]];
-                    } else if (d === "bfp") {
-                        tmp[d] = [stidAndDist[i][1]];
-                    } else if (d === "weather_condition") {
-                        try {
-                            tmp[d] = [_s[i].OBSERVATIONS[d + "_set_1d"][last]] // add to include cardinal direction
-                        } catch (e) {
-                            tmp[d] = [null];
-                        }
-                    } else if (typeof _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"] === "undefined") {
+                // Best to use terinary logic here, but for simplicity...
+                if (d === "dfp") {
+                    tmp[d] = [stidAndDist[i][0]];
+                } else if (d === "bfp") {
+                    tmp[d] = [stidAndDist[i][1]];
+                } else if (d === "weather_condition") {
+                    try {
+                        tmp[d] = [_s[i].OBSERVATIONS[d + "_set_1d"][last]] // add to include cardinal direction
+                    } catch (e) {
                         tmp[d] = [null];
-                    } else if (_s[i]["QC_FLAGGED"] == true && d !== "date_time") {
-                        // console.log(_s[i])
-                        var _d = _s[i].OBSERVATIONS[d + "_set_1"][last]
-                            // var j = 0;
-                        for (var j in _s[i].QC) {
-                            // console.log(_s[i].QC);
-                            // console.log(d);
-                            if (typeof _s[i].QC[d + "_set_1"] !== "undefined") {
-                                // var _qcFlag = _s[i].QC
-                                // console.log(_s[i].QC[d + "_set_1"])
-                                tmp[d] = [_d, _s[i].QC[d + "_set_1"][last]]
-                            } else {
-                                tmp[d] = [_d]
-                            }
-                        }
-
-                    } else {
-                        tmp[d] = [_s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last]]
                     }
-                })
-                // Append to our new `stations` array
+                } else if (typeof _s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"] === "undefined") {
+                    tmp[d] = [null];
+                } else if (_s[i]["QC_FLAGGED"] == true && d !== "date_time") {
+                    // console.log(_s[i])
+                    var _d = _s[i].OBSERVATIONS[d + "_set_1"][last]
+                    // var j = 0;
+                    for (var j in _s[i].QC) {
+                        // console.log(_s[i].QC);
+                        // console.log(d);
+                        if (typeof _s[i].QC[d + "_set_1"] !== "undefined") {
+                            // var _qcFlag = _s[i].QC
+                            // console.log(_s[i].QC[d + "_set_1"])
+                            tmp[d] = [_d, _s[i].QC[d + "_set_1"][last]]
+                        } else {
+                            tmp[d] = [_d]
+                        }
+                    }
+
+                } else {
+                    tmp[d] = [_s[i].OBSERVATIONS[d === "date_time" ? d : d + "_set_1"][last]]
+                }
+            })
+            // Append to our new `stations` array
             stations.push(tmp);
             tmp = []
-                // console.log(stations)
+            // console.log(stations)
             i++;
         }
 
@@ -253,8 +257,8 @@
         d3.select("body " + args.table_container).selectAll("table").remove();
         var table = d3.select("body " + args.table_container).append("table")
             .attr("id", args.table_id).classed("table table-condensed", true)
-            // .data(headerNames).enter().append("th")
-            // Make the header
+        // .data(headerNames).enter().append("th")
+        // Make the header
         table.append("thead").attr("class", "fixed-header").append("tr")
             .selectAll("th").data(["stid"].concat(rankedSensors)).enter().append("th")
             .html(function (d, i) {
