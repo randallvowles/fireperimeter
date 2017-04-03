@@ -14,12 +14,12 @@
     apiArgs.vars = rankedSensors.join(",");
     apiArgs.units = "english,speed|mph";
     apiArgs.qc = "all";
-    // apiArgs.recent = "61";
+    apiArgs.recent = "61";
     apiArgs.timeformat = "%s";
-    // Forced time for presentation purposes
-    apiArgs.start = "201611282245";
-    apiArgs.end = "201611290100";
-    apiArgs.uimode = "default"
+    // // Forced time for presentation purposes
+    // apiArgs.start = "201611282245";
+    // apiArgs.end = "201611290100";
+    // apiArgs.uimode = "default"
 
     var tableArgs = {
         table_container: "#nettable-container",
@@ -33,10 +33,63 @@
     ];
     var stidStack = [];
     var stidAndDist = [];
+
+
+    var state = {
+        baseUrl: 'http://http://home.chpc.utah.edu/~u0540701/storage/fire_data/',
+        thisJSONFile: "AF_NS_current.json"
+    }
+
+    function HTTPFetch(url, callback) {
+        var request = new XMLHttpRequest();
+        request.open("GET", url)
+        request.onreadystatechange = function () {
+            if (request.readyState === 4 && request.status === 200) {
+                json_total = JSON.parse(request.responseText)
+                callback(JSON.parse(request.responseText))
+            }
+        }
+        request.send(null);
+    }
+    function printResponse(a) {
+        var current_json = a
+        console.log('URL To Fetch')
+        console.log(state.baseUrl + state.thisJSONFile)
+        console.log(a)
+    }
+    function getWindowArgs() {
+        var a = {};
+        var b = window.location.search.substring(1).split("&");
+        var pair;
+        var c;
+        var l = b.length;
+
+        if (window.location.search.substring(1).split("=") === 1) {
+            return "undefined";
+        } else {
+            for (var i = 0; i < l; i++) {
+                // Grab the values and add a key
+                pair = b[i].split("=");
+                if (typeof a[pair[0]] === "undefined") {
+                    a[pair[0]] = decodeURIComponent(pair[1]);
+                    // if (pair[1].split(",").length > 1) {
+                    //     a[pair[0]] = pair[1].split(",");
+                    // }
+                }
+            }
+            return a;
+        }
+    }
+
+    var windowURL = getWindowArgs();
+    var fireID = windowURL.fire;
+
+    HTTPFetch(state.baseUrl + state.thisJSONFile, printResponse)
+
     var key;
-    for (key in chimney_top50.nearest_stations) {
-        stidStack.push(chimney_top50.nearest_stations[key]["STID"]);
-        stidAndDist.push(chimney_top50.nearest_stations[key]["DFP"]);
+    for (key in current_json.fireID.nearest_stations) {
+        stidStack.push(current_json.fireID.nearest_stations[key]["STID"]);
+        stidAndDist.push(ccurrent_json.fireID.nearest_stations[key]["DFP"]);
     };
 
     var stidList = stidStack.join(",");
