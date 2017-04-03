@@ -36,7 +36,7 @@
 
 
     var state = {
-        baseUrl: 'http://http://home.chpc.utah.edu/~u0540701/storage/fire_data/',
+        baseUrl: 'http://home.chpc.utah.edu/~u0540701/storage/fire_data/',
         thisJSONFile: "AF_NS_current.json"
     }
 
