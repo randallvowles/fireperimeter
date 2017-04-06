@@ -100,10 +100,11 @@
     apiArgs.stid = stidList;
     M.fetch({
         api_args: apiArgs
-        var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
-        // console.log(filter)
-        M.printResponse();
-    })
+        })
+    var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
+    // console.log(filter)
+    M.printResponse()
+    
     $.when(M.async()).done(function () {
         //timestamp and map function
         M.response.sensor.units[0].bfp = "Degrees"
