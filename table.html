@@ -119,7 +119,7 @@
 </body>
 <script type="text/javascript">
     var d = new Date();
-    document.getElementById("page-time").innerHTML = d.toDateString();
+    document.getElementById("page-time").innerHTML = d.toUTCString();
     function _exclusions(checkbox) {
         d3.selectAll("th").each(function () {
             d3.select(this.parentNode).classed("hasBang", true)
