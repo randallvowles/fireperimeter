@@ -106,7 +106,7 @@
     // // console.log(filter)
     // M.printResponse()
 
-    $.getJSON(state.baseUrl + state.thisJSONFile, function(data){
+    $.getJSON(state.baseUrl + state.thisJSONFile, function (data) {
         var current_json = data;
         console.log(current_json);
         var key;
@@ -118,73 +118,74 @@
         apiArgs.stid = stidList;
         M.fetch({
             api_args: apiArgs
-            })
+        })
         var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
         // console.log(filter)
         M.printResponse()
-    })
 
-    $.when(M.async()).done(function () {
-        //timestamp and map function
-        M.response.sensor.units[0].bfp = "Degrees"
-        M.response.sensor.units[0].dfp = "Statute miles"
-        M.response.sensor.units[0].date_time = "Minutes"
-        M.response.sensor.units[0].wind_direction = "code"
-        M.response.sensor.units[0].weather_condition = "code"
-        M.response.ui.toc["bfp"] = 4
-        M.response.ui.toc["dfp"] = 5
-        M.response.ui.toc["stid"] = 6
-        M.response.ui.toc["weather_condition"] = 7
-        M.response.ui.toc["time"] = 8
-        M.response.ui.sensors[4] = {
-            "apiname": "bfp",
-            "default": "true",
-            "group": 99,
-            "longname": "Bearing From Perimeter",
-            "pos": 99,
-            "shortname": "BFP",
-            "vid": 99
-        }
-        M.response.ui.sensors[5] = {
-            "apiname": "dfp",
-            "default": "true",
-            "group": 99,
-            "longname": "Distance From Perimeter",
-            "pos": 99,
-            "shortname": "DFP",
-            "vid": 99
-        }
-        M.response.ui.sensors[6] = {
-            "apiname": "stid",
-            "default": "true",
-            "group": 99,
-            "longname": "Station ID",
-            "pos": 99,
-            "shortname": "STID",
-            "vid": 99
-        }
-        M.response.ui.sensors[7] = {
-            "apiname": "weather_condition",
-            "default": "true",
-            "group": 99,
-            "longname": "Weather Condition",
-            "pos": 99,
-            "shortname": "WC",
-            "vid": 99
-        }
-        M.response.ui.sensors[8] = {
-            "apiname": "time",
-            "default": "true",
-            "group": 99,
-            "longname": "Time From Observation",
-            "pos": 99,
-            "shortname": "TFO",
-            "vid": 99
-        }
-        _networkTableEmitter(M, tableArgs);
-        _highlightCells(filter);
-        _highlightQC(M.response);
-    });
+
+        $.when(M.async()).done(function () {
+            //timestamp and map function
+            M.response.sensor.units[0].bfp = "Degrees"
+            M.response.sensor.units[0].dfp = "Statute miles"
+            M.response.sensor.units[0].date_time = "Minutes"
+            M.response.sensor.units[0].wind_direction = "code"
+            M.response.sensor.units[0].weather_condition = "code"
+            M.response.ui.toc["bfp"] = 4
+            M.response.ui.toc["dfp"] = 5
+            M.response.ui.toc["stid"] = 6
+            M.response.ui.toc["weather_condition"] = 7
+            M.response.ui.toc["time"] = 8
+            M.response.ui.sensors[4] = {
+                "apiname": "bfp",
+                "default": "true",
+                "group": 99,
+                "longname": "Bearing From Perimeter",
+                "pos": 99,
+                "shortname": "BFP",
+                "vid": 99
+            }
+            M.response.ui.sensors[5] = {
+                "apiname": "dfp",
+                "default": "true",
+                "group": 99,
+                "longname": "Distance From Perimeter",
+                "pos": 99,
+                "shortname": "DFP",
+                "vid": 99
+            }
+            M.response.ui.sensors[6] = {
+                "apiname": "stid",
+                "default": "true",
+                "group": 99,
+                "longname": "Station ID",
+                "pos": 99,
+                "shortname": "STID",
+                "vid": 99
+            }
+            M.response.ui.sensors[7] = {
+                "apiname": "weather_condition",
+                "default": "true",
+                "group": 99,
+                "longname": "Weather Condition",
+                "pos": 99,
+                "shortname": "WC",
+                "vid": 99
+            }
+            M.response.ui.sensors[8] = {
+                "apiname": "time",
+                "default": "true",
+                "group": 99,
+                "longname": "Time From Observation",
+                "pos": 99,
+                "shortname": "TFO",
+                "vid": 99
+            }
+            _networkTableEmitter(M, tableArgs);
+            _highlightCells(filter);
+            _highlightQC(M.response);
+        });
+    })
     return
 
     /**
