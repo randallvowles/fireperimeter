@@ -450,8 +450,8 @@
             });
         var timeConversion = d3.selectAll(".date_time")
             .text(function (d) {
-                // var timeNow = String(Date.now()).slice(0, -3);
-                var timeNow = String(Date.parse("Nov 29, 2016 01:05:00 UTC")).slice(0, -3);
+                var timeNow = String(Date.now()).slice(0, -3);
+                // var timeNow = String(Date.parse("Nov 29, 2016 01:05:00 UTC")).slice(0, -3);
                 return ((timeNow - d.value) / 60).toFixed(0);
             })
     }

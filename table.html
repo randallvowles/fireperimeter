@@ -124,6 +124,9 @@
         d3.selectAll("th").each(function () {
             d3.select(this.parentNode).classed("hasBang", true)
         });
+        d3.selectAll("tabtable-units").each(function () {
+            d3.select(this.parentNode).classed("hasBang", true)
+        });
         d3.selectAll("tr").selectAll(".bang").each(function (d) {
             d3.select(this.parentNode).classed('hasBang', true)
         })
