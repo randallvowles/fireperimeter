@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+
+<head>
+    <title>Current Fire Weather</title>
+    <link href='assets/fonts/font-awesome-4.7.0/css/font-awesome.min.css' rel="stylesheet">
+    <link href="assets/css/main.css" rel="stylesheet">
+    <!--<link href="https://synopticlabs.org/demos/qc//assets/css/main.css" rel="stylesheet">-->
+    <!--<script src="https://synopticlabs.org/demos/qc/assets/js/baseplate-ca89fd0ebe15c0c8b1d46f967269d19b.js" id="__js-baseplate"></script>-->
+    <!--<script src="assets/js/core/baseplate.js"></script>-->
+    <script src="assets/js/core/baseplate.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!--<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />-->
+    <!--<script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>-->
+    <style>
+        .bang {
+            background: red;
+            font-weight: bold;
+            border: 1px solid black !important;
+            text-align: center;
+        }
+        
+        .boom {
+            background: yellow;
+            font-weight: bold;
+            border: 1px solid black !important;
+            text-align: center;
+        }
+        
+        .qcbang {
+            background: repeating-linear-gradient(-60deg, red, red 30px, yellow 30px, yellow 55px);
+            font-weight: bold;
+            border: 1px solid black !important;
+            text-align: center;
+        }
+        
+        .hasBang {
+            /*font-weight: bold;*/
+        }
+        
+        .hide {
+            display: none;
+        }
+        
+        .qc-tooltip {
+            list-style: none;
+            margin-left: -1em;
+        }
+        
+        .border-right {
+            border-right: 1px solid #e5e5e5;
+            padding-left: 0.5em;
+        }
+        
+        .table td {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <container>
+        <div class="row">
+            <div class="col-sm-12">
+                <article>
+                    <p class="page-title">
+                        <h1>Monitoring Weather Conditions Near Wildfires</h1>
+                    </p>
+                    <hr/>
+                    <p>
+                        For an introduction and more information on this page, click <a href="http://home.chpc.utah.edu/~u0540701/fireperimeter/help.html">here</a>.
+                        </p>
+                        <p>
+                            To view these stations on a map, click <a href="http://mesowest.utah.edu/cgi-bin/droman/mesomap.cgi?lat=35.6960574336723&lon=-83.5073079274911&radius=50">here</a>.
+                            </p>
+                        <hr/>
+                        <h4>Current time: </h4>
+                        <hr/>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-2 border-right">
+                <label>Air Temperature - </label></br>
+                <label>Min: <input type="text" maxlength="3" size="10" id="minValueAT"></label></br>
+                <label>Max: <input type="text" maxlength=3 size="10" id="maxValueAT"></label></br>
+                <label>Relative Humidity - </label></br>
+                <label>Min: <input type="text" maxlength=3 size="10" id="minValueRH" ></label></br>
+                <label>Max: <input type="text" maxlength=3 size="10" id="maxValueRH"></label></br>
+                <label>Wind Speed - </label></br>
+                <label>Min: <input type="text" maxlength=3 size="10" id="minValueWS"></label></br>
+                <label>Max: <input type="text" maxlength=3 size="10" id="maxValueWS"></label></br>
+                <label>Wind Gust - </label></br>
+                <label>Min: <input type="text" maxlength=3 size="10" id="minValueWG"></label></br>
+                <label>Max: <input type="text" maxlength=3 size="10" id="maxValueWG"></label></br>
+                <!--<label>Wind Direction - </label>
+        <label>Min: <input type="text" maxlength=3 id="minValueWD"></label>
+        <label>Max: <input type="text" maxlength=3 id="maxValueWD"></label></br>-->
+                <hr/>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-default" onclick=_applyRule()>Apply</button>
+                    <button type="button" class="btn btn-default" onclick=_updateURL()>Apply & Update URL</button>
+                </div>
+                <hr/>
+                <label>Exclude stations that do not meet any of the selected parameters? <input type="checkbox" onclick="_exclusions(this);"></label>
+                <hr/>
+            </div>
+            <div class="col-sm-12 col-md-10">
+                <div class="table-responsive">
+                    <div id="nettable-container"></div>
+                </div>
+            </div>
+            <hr/>
+            <div class="col-sm-12 col-md-12 footer">
+                Page created by Randall Vowles 2016-2017, send all questions or comments to randall.vowles@utah.edu
+            </div>
+</body>
+<script type="text/javascript">
+    function _exclusions(checkbox) {
+        d3.selectAll("th").each(function () {
+            d3.select(this.parentNode).classed("hasBang", true)
+        });
+        d3.selectAll("tr").selectAll(".bang").each(function (d) {
+            d3.select(this.parentNode).classed('hasBang', true)
+        })
+        d3.selectAll("tr").classed("hide", function (d) {
+            if (d3.select(this).classed("hasBang") === true) {
+                return false
+            } else {
+                return checkbox.checked;
+            }
+        })
+    }
+
+    function _updateURL() {
+        var minValueAT = Number(document.getElementById('minValueAT').value);
+        var maxValueAT = Number(document.getElementById('maxValueAT').value);
+        var minValueRH = Number(document.getElementById('minValueRH').value);
+        var maxValueRH = Number(document.getElementById('maxValueRH').value);
+        var minValueWS = Number(document.getElementById('minValueWS').value);
+        var maxValueWS = Number(document.getElementById('maxValueWS').value);
+        var minValueWG = Number(document.getElementById('minValueWG').value);
+        var maxValueWG = Number(document.getElementById('maxValueWG').value);
+        // var minValueWD = Number(document.getElementById('minValueWD').value);
+        // var maxValueWD = Number(document.getElementById('maxValueWD').value);
+        var current_url = window.location.href
+        var base_url = current_url.replace(/(\?select=)\S+(\}\})/, "");
+        var filterInterface = {
+            "air_temp": {
+                "min": minValueAT,
+                "max": maxValueAT
+            },
+            "relative_humidity": {
+                "min": minValueRH,
+                "max": maxValueRH
+            },
+            "wind_speed": {
+                "min": minValueWS,
+                "max": maxValueWS
+            },
+            "wind_gust": {
+                "min": minValueWG,
+                "max": maxValueWG
+            }
+            // "wind_direction": {
+            //     "min": minValueWD,
+            //     "max": maxValueWD
+            // }
+        };
+        var newURL = base_url + "?select=" + JSON.stringify(filterInterface);
+        // var newURL = "?select=" + JSON.stringify(filterInterface);
+        window.location.href = newURL;
+    }
+
+    function _applyRule() {
+        var minValueAT = Number(document.getElementById('minValueAT').value);
+        var maxValueAT = Number(document.getElementById('maxValueAT').value);
+        var minValueRH = Number(document.getElementById('minValueRH').value);
+        var maxValueRH = Number(document.getElementById('maxValueRH').value);
+        var minValueWS = Number(document.getElementById('minValueWS').value);
+        var maxValueWS = Number(document.getElementById('maxValueWS').value);
+        var minValueWG = Number(document.getElementById('minValueWG').value);
+        var maxValueWG = Number(document.getElementById('maxValueWG').value);
+        // var minValueWD = Number(document.getElementById('minValueWD').value);
+        // var maxValueWD = Number(document.getElementById('maxValueWD').value);
+        var current_url = window.location.href
+        var base_url = current_url.replace(/(\?select=)\S+(\}\})/, "");
+        var filterInterface = {
+            "air_temp": {
+                "min": minValueAT,
+                "max": maxValueAT
+            },
+            "relative_humidity": {
+                "min": minValueRH,
+                "max": maxValueRH
+            },
+            "wind_speed": {
+                "min": minValueWS,
+                "max": maxValueWS
+            },
+            "wind_gust": {
+                "min": minValueWG,
+                "max": maxValueWG
+            }
+            // "wind_direction": {
+            //     "min": minValueWD,
+            //     "max": maxValueWD
+            // }
+        };
+        // var newURL = base_url + "?select=" + JSON.stringify(filterInterface);
+        // var newURL = "?select=" + JSON.stringify(filterInterface);
+        // window.location.href = newURL;
+        _highlightCells(filterInterface)
+
+
+        /**
+         * Highlights Cells based on user-defined parameters
+         * @param {object} Selector, Min, Max
+         */
+        function _highlightCells(object) {
+            //     object in the form:
+            //     {selector: {"min": A, max": B}}
+            var i = 0;
+            var filter = (filterInterface);
+            d3.selectAll("td").classed("bang", function () {
+                return false
+            });
+            var key;
+            for (key in Object.keys(filter)) {
+                var selector = (Object.keys(filter))[key];
+                // console.log("Variable selected = " + selector);
+                // assign min/max values, test for null
+                var A = typeof filter[selector].min === "undefined" || filter[selector].min === 0 ? null : filter[
+                    selector].min;
+                var B = typeof filter[selector].max === "undefined" || filter[selector].max === 0 ? null : filter[
+                    selector].max;
+                // console.log("Min = " + A);
+                // console.log("Max = " + B);
+                if (typeof selector === "undefined") {
+                    return false;
+                };
+                // if (typeof A !== "undefined" || A !== null && typeof B !== "undefined" || B !== null) {
+                if (A !== null && B !== null) {
+                    // range code, given a min and a max
+                    d3.selectAll('.' + selector).classed("bang", function () {
+                        return Number(d3.select(this).text()) > A &&
+                            Number(d3.select(this).text()) < B ? true : false;
+                    });
+                    // } else if (typeof A !== "undefined" || A !== null && typeof B === "undefined" || B === null) {
+                } else if (A !== null && B === null) {
+                    // greater-than code, min but no max
+                    d3.selectAll('.' + selector).classed("bang", function () {
+                        return Number(d3.select(this).text()) > A ? true : false;
+                    });
+                    // } else if (typeof A === "undefined" || A === null && typeof B !== "undefined" || B !== null) {
+                } else if (A === null && B !== null) {
+                    // less-than code, max but no min
+                    d3.selectAll('.' + selector).classed("bang", function () {
+                        return Number(d3.select(this).text()) < B ? true : false;
+                    });
+                } else if (A === null && B === null) {
+                    continue;
+                } else {
+                    console.log("Bang! Bang! Something went terribly wrong!")
+                };
+            };
+        };
+        d3.selectAll("td").classed("boom", function (d) {
+            try {
+                return d.value.length > 1 && !!d.value[1] && d.name !== "stid" ? true : false;
+            } catch (e) {
+                console.log(d.value)
+            }
+        })
+        d3.selectAll("td").classed("qcbang", function (d) {
+            if (d3.select(this).classed("boom") === true && d3.select(this).classed("bang") === true) {
+                return true
+            } else {
+                return false
+            }
+        })
+    };
+</script>
+<!--<script src="assets/js/core/mesonet-current.min.js"></script>-->
+<script src="assets/js/core/mesonet-current.js"></script>
+<!--<script src="assets/js/core/chimney_top50.js"></script>-->
+<!--<script src="http://dev2.mesowest.net/tomato//assets/js/core/d3.v4.js"></script>-->
+<script src="https://d3js.org/d3.v4.js"></script>
+<!--<script src="assets/js/core/d3.v4.min.js"></script>-->
+<script src="assets/js/apps/app-fireperimeter.js"></script>
+<script src="assets/js/core/core.units.js"></script>
+
+</html>

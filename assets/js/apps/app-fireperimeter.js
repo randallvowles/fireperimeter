@@ -37,9 +37,9 @@
 
     var state = {
         baseUrl: 'http://home.chpc.utah.edu/~u0540701/storage/fire_data/',
-        thisJSONFile: "AF_NS_current.json"
+        thisJSONFile: "current__metadatastash.json"
     }
-    var json_total = []
+    var json_total = {};
 
     function HTTPFetch(url, callback) {
         var request = new XMLHttpRequest();
@@ -57,6 +57,7 @@
         console.log('URL To Fetch')
         console.log(state.baseUrl + state.thisJSONFile)
         console.log(a)
+        json_total = a
     }
 
     function getWindowArgs() {
@@ -87,24 +88,41 @@
     var fireID = windowURL.fire;
     console.log(fireID);
 
-    HTTPFetch(state.baseUrl + state.thisJSONFile, printFetchResponse);
-    var current_json = json_total;
-    console.log(current_json);
-    var key;
-    for (key in current_json[fireID][nearest_stations]) {
-        stidStack.push(current_json[fireID][nearest_stations][key]["STID"]);
-        stidAndDist.push(current_json[fireID][nearest_stations][key]["DFP"]);
-    };
+    // HTTPFetch(state.baseUrl + state.thisJSONFile, printFetchResponse);
+    // var current_json = json_total;
+    // console.log(current_json);
+    // var key;
+    // for (key in current_json[fireID][nearest_stations]) {
+    //     stidStack.push(current_json[fireID][nearest_stations][key]["STID"]);
+    //     stidAndDist.push(current_json[fireID][nearest_stations][key]["DFP"]);
+    // };
+    // var stidList = stidStack.join(",");
+    // apiArgs.stid = stidList;
+    // M.fetch({
+    //     api_args: apiArgs
+    //     })
+    // var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
+    // // console.log(filter)
+    // M.printResponse()
 
-    var stidList = stidStack.join(",");
-    apiArgs.stid = stidList;
-    M.fetch({
-        api_args: apiArgs
-        })
-    var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
-    // console.log(filter)
-    M.printResponse()
-    
+    $.getJSON(state.baseUrl + state.thisJSONFile, function(data){
+        var current_json = data;
+        console.log(current_json);
+        var key;
+        for (key in current_json[fireID][nearest_stations]) {
+            stidStack.push(current_json[fireID][nearest_stations][key]["STID"]);
+            stidAndDist.push(current_json[fireID][nearest_stations][key]["DFP"]);
+        };
+        var stidList = stidStack.join(",");
+        apiArgs.stid = stidList;
+        M.fetch({
+            api_args: apiArgs
+            })
+        var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
+        // console.log(filter)
+        M.printResponse()
+    })
+
     $.when(M.async()).done(function () {
         //timestamp and map function
         M.response.sensor.units[0].bfp = "Degrees"
@@ -182,7 +200,7 @@
         var rankedSensors = args.sensors;
         // var baseURL = ["http://mesowest.utah.edu/cgi-bin/droman/meso_base_dyn.cgi?stn="];
         var new_baseURL = ["https://synopticlabs.org/demos/qc/tabtable.html?override_units=1&units=english,speed|mph&recent=1440&stid="];
-        // Insert the `date_time` value into `rankedSensors`, we do this to make sure 
+        // Insert the `date_time` value into `rankedSensors`, we do this to make sure
         // we generate the table correctly.  We also want an array to put our sorted keys
         // back in to.  Once the sensors are ranked, we will create a sorted output that
         // will be ready to generate a table from.
@@ -207,7 +225,7 @@
         var stations = [];
         while (i < l) {
             // We need to find the last element in the array, since that should be the most
-            // current for the text range. Then we populate it with key/value pairs that 
+            // current for the text range. Then we populate it with key/value pairs that
             // contain the most recent value for the time period requested. As we go, we will
             // always be looking for null values and handling them.
 
@@ -264,7 +282,7 @@
         table.append("thead").attr("class", "fixed-header").append("tr")
             .selectAll("th").data(["stid"].concat(rankedSensors)).enter().append("th")
             .html(function (d, i) {
-                // console.log(i); 
+                // console.log(i);
                 return headerNames[i];
             })
             .attr("id", function (d) {
@@ -353,8 +371,8 @@
                 return d === "dfp" ? true : false;
             })
 
-        // Add the units to the table. We add this as a `TD` in the `THEAD` node.  If you change 
-        // this to `TH` you will need to update the filtering of `TH` elements in the update 
+        // Add the units to the table. We add this as a `TD` in the `THEAD` node.  If you change
+        // this to `TH` you will need to update the filtering of `TH` elements in the update
         // table width routine.
         table.select("thead").append("tr")
             .selectAll("th").data(["stid"].concat(rankedSensors)).enter().append("td")
