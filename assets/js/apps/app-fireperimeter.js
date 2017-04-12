@@ -110,9 +110,9 @@
         var current_json = data;
         console.log(current_json);
         var key;
-        for (key in current_json[fireID][nearest_stations]) {
-            stidStack.push(current_json[fireID][nearest_stations][key]["STID"]);
-            stidAndDist.push(current_json[fireID][nearest_stations][key]["DFP"]);
+        for (key in current_json[fireID]["nearest_stations"]) {
+            stidStack.push(current_json[fireID]["nearest_stations"][key]["STID"]);
+            stidAndDist.push(current_json[fireID]["nearest_stations"][key]["DFP"]);
         };
         var stidList = stidStack.join(",");
         apiArgs.stid = stidList;
