@@ -19,7 +19,7 @@
     // // Forced time for presentation purposes
     // apiArgs.start = "201611282245";
     // apiArgs.end = "201611290100";
-    // apiArgs.uimode = "default"
+    apiArgs.uimode = "default"
 
     var tableArgs = {
         table_container: "#nettable-container",
