@@ -102,8 +102,8 @@
     // M.fetch({
     //     api_args: apiArgs
     //     })
-    // var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
-    // // console.log(filter)
+    var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
+    console.log(filter)
     // M.printResponse()
 
     $.getJSON(state.baseUrl + state.thisJSONFile, function (data) {
@@ -119,7 +119,7 @@
         M.fetch({
             api_args: apiArgs
         })
-        var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
+        // var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
         // console.log(filter)
         M.printResponse()
 
