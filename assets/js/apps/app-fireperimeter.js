@@ -116,6 +116,7 @@
         var fire_keys = [];
         for (a in current_json){
             fire_keys.push(a);
+            console.log(a)
             d3.selectAll(".selectFire").each(function(d){
                 d3.select(this)
                 .append("li")
