@@ -588,7 +588,7 @@
             .text("Select Active Fire")
             .append("div")
             .attr("id", "fireSelect")
-            .class("dropdown-content", true);
+            .classed("dropdown-content", true);
     }
 
     /* When the user clicks on the button,
