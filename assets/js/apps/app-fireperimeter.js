@@ -185,6 +185,7 @@
             _networkTableEmitter(M, tableArgs);
             _highlightCells(filter);
             _highlightQC(M.response);
+            generateDropdownMenu();
         });
     })
     return
@@ -568,6 +569,24 @@
         } else {
             return ""
         }
+    }
+
+    function generateDropdownMenu() {
+        d3.selectAll(".page-title").append("div")
+            .classed("dropdown", true)
+            .append("button")
+            .attr("onclick", "selectFire()")
+            .classed("dropbtn", true)
+            .text("Select Active Fire")
+            .append("div")
+            .attr("id", "fireSelect")
+            .class("dropdown-content", true);
+    }
+
+    /* When the user clicks on the button,
+    toggle between hiding and showing the dropdown content */
+    function selectFire() {
+        document.getElementById("fireSelect").classList.toggle("show");
     }
 
 

@@ -174,39 +174,6 @@
     var d = new Date();
     document.getElementById("page-time").innerHTML = d.toUTCString();
 
-    function generateDropdownMenu() {
-        d3.selectAll(".page-title").append("div")
-            .classed("dropdown", true)
-            .append("button")
-            .attr("onclick", "selectFire()")
-            .classed("dropbtn", true)
-            .text("Select Active Fire")
-            .append("div")
-            .attr("id", "fireSelect")
-            .class("dropdown-content", true);
-    }
-    generateDropdownMenu();
-    /* When the user clicks on the button,
-    toggle between hiding and showing the dropdown content */
-    function selectFire() {
-        document.getElementById("fireSelect").classList.toggle("show");
-    }
-
-    // Close the dropdown menu if the user clicks outside of it
-    window.onclick = function (event) {
-        if (!event.target.matches('.dropbtn')) {
-            var dropdowns = document.getElementsByClassName("dropdown-content");
-            var i;
-            for (i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
-                if (openDropdown.classList.contains('show')) {
-                    openDropdown.classList.remove('show');
-                }
-            }
-        }
-    }
-
-
     function _exclusions(checkbox) {
         d3.selectAll("th").each(function () {
             d3.select(this.parentNode).classed("hasBang", true)
@@ -374,6 +341,22 @@
             }
         })
     };
+
+
+    // Close the dropdown menu if the user clicks outside of it
+    window.onclick = function (event) {
+        if (!event.target.matches('.dropbtn')) {
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            var i;
+            for (i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    }
+
 </script>
 <!--<script src="assets/js/core/mesonet-current.min.js"></script>-->
 <script src="assets/js/core/mesonet-current.js"></script>
