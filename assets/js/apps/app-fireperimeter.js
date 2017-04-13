@@ -116,8 +116,9 @@
         var fire_keys = [];
         for (a in current_json){
             fire_keys.push(a);
-            d3.selectAll(".fireSelect").each(function(d){
+            d3.selectAll(".selectFire").each(function(d){
                 d3.select(this)
+                .append("li")
                 .append("a")
                 .href("http://home.chpc.utah.edu/~u0540701/fireperimeter/table.html?fire="+a)
                 .text(a);
@@ -607,9 +608,9 @@
 
     /* When the user clicks on the button,
     toggle between hiding and showing the dropdown content */
-    function _selectFire() {
-        document.getElementById("fireSelect").classList.toggle("show");
-    }
+    // function _selectFire() {
+    //     document.getElementById("fireSelect").classList.toggle("show");
+    // }
 
 
 })();
