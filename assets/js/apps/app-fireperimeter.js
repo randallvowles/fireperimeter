@@ -116,11 +116,12 @@
         var fire_keys = []
         for (a in current_json){
             fire_keys.push(a);
-            d3.selectAll(".fireSelect")
-            .append("a")
-            .href("http://home.chpc.utah.edu/~u0540701/fireperimeter/table.html?fire="+a)
-            .text(a);
-
+            d3.selectAll(".fireSelect").each(function(){
+                d3.select("this")
+                .append("a")
+                .href("http://home.chpc.utah.edu/~u0540701/fireperimeter/table.html?fire="+a)
+                .text(a);
+            })
         }
 
         try{
