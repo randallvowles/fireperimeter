@@ -57,6 +57,56 @@
         .table td {
             white-space: nowrap;
         }
+        /* Dropdown Button */
+
+        .dropbtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 16px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        /* Dropdown button on hover & focus */
+
+        .dropbtn:hover,
+        .dropbtn:focus {
+            background-color: #3e8e41;
+        }
+        /* The container <div> - needed to position the dropdown content */
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        /* Dropdown Content (Hidden by Default) */
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+        /* Links inside the dropdown */
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        /* Change color of dropdown links on hover */
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1
+        }
+        /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+
+        .show {
+            display: block;
+        }
     </style>
 </head>
 
@@ -69,15 +119,18 @@
                         <h1>Monitoring Weather Conditions Near Wildfires</h1>
                     </p>
                     <hr/>
+
                     <p>
                         For an introduction and more information on this page, click <a href="http://home.chpc.utah.edu/~u0540701/fireperimeter/help.html">here</a>.
-                        </p>
-                        <!--<p>
+                    </p>
+                    <!--<p>
                             To view these stations on a map, click <a href="http://mesowest.utah.edu/cgi-bin/droman/mesomap.cgi?lat=35.6960574336723&lon=-83.5073079274911&radius=50">here</a>.
                             </p>-->
-                        <hr/>
-                        <h4>Current time: <p id="page-time"></p></h4>
-                        <hr/>
+                    <hr/>
+                    <h4>Current time:
+                        <p id="page-time"></p>
+                    </h4>
+                    <hr/>
                 </article>
             </div>
         </div>
@@ -120,6 +173,41 @@
 <script type="text/javascript">
     var d = new Date();
     document.getElementById("page-time").innerHTML = d.toUTCString();
+
+    function generateDropdownMenu() {
+        d3.select(".page-title").append("div")
+            .classed("dropdown", true)
+            .append("button")
+            .attr("onclick", "selectFire()")
+            .classed("dropbtn", true)
+            .text("Select Active Fire")
+            .append("div")
+            .attr("id", "fireSelect")
+            .class("dropdown-content", true)
+    }
+
+    /* When the user clicks on the button,
+    toggle between hiding and showing the dropdown content */
+    function selectFire() {
+        document.getElementById("fireSelect").classList.toggle("show");
+    }
+
+    // Close the dropdown menu if the user clicks outside of it
+    window.onclick = function (event) {
+        if (!event.target.matches('.dropbtn')) {
+
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            var i;
+            for (i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    }
+
+
     function _exclusions(checkbox) {
         d3.selectAll("th").each(function () {
             d3.select(this.parentNode).classed("hasBang", true)

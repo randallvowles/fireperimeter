@@ -85,6 +85,7 @@
         }
     }
 
+
     var windowURL = getWindowArgs();
     var fireID = windowURL.fire;
     console.log(fireID);
