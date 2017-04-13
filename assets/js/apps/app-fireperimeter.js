@@ -109,9 +109,20 @@
     _generateDropdownMenu();
 
     $.getJSON(state.baseUrl + state.thisJSONFile, function (data) {
-        try{
+
         var current_json = data;
         console.log(current_json);
+        var a;
+        fireID_keys = []
+        for (a in current_json){
+            d3.selectAll(".fireSelect")
+            .append("a")
+            .href("http://home.chpc.utah.edu/~u0540701/fireperimeter/table.html?fire="+a)
+            .text(a)
+
+        }
+
+        try{
         var key;
         for (key in current_json[fireID]["nearest_stations"]) {
             stidStack.push(current_json[fireID]["nearest_stations"][key]["STID"]);
@@ -193,6 +204,7 @@
         } catch(err){
             d3.selectAll(".nettable-container")
             .append("div")
+            .classed("row col-sm-12", true)
             .append("p").text("Please select an Active Fire from the menu to generate the table.")
         }
     })
