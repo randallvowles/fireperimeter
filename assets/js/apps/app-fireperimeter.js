@@ -121,7 +121,7 @@
                 d3.select(this)
                 .append("li")
                 .append("a")
-                .attr("href", "http://home.chpc.utah.edu/~u0540701/fireperimeter/table.html?fire="+toString(a))
+                .attr("href", "http://home.chpc.utah.edu/~u0540701/fireperimeter/table.html?fire="+a)
                 .text(a);
             })
         }
