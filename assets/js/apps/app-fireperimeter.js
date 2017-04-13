@@ -108,6 +108,7 @@
     // M.printResponse()
 
     $.getJSON(state.baseUrl + state.thisJSONFile, function (data) {
+        generateDropdownMenu();
         try{
         var current_json = data;
         console.log(current_json);
@@ -186,11 +187,13 @@
             _networkTableEmitter(M, tableArgs);
             _highlightCells(filter);
             _highlightQC(M.response);
-            generateDropdownMenu();
+
 
         });
         } catch(err){
-            d3.selectAll(".nettable-container").append("p").text("Please select an Active Fire from the menu to generate the table.")
+            d3.selectAll(".nettable-container")
+            .append("div")
+            .append("p").text("Please select an Active Fire from the menu to generate the table.")
         }
     })
     return
