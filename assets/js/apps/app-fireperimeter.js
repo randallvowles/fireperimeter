@@ -113,7 +113,6 @@
         var current_json = data;
         console.log(current_json);
         var a;
-        fireID_keys = []
         for (a in current_json){
             d3.selectAll(".fireSelect")
             .append("a")
