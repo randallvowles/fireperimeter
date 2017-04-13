@@ -106,7 +106,7 @@
     var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
     console.log(filter)
     // M.printResponse()
-    _generateDropdownMenu();
+    // _generateDropdownMenu();
 
     $.getJSON(state.baseUrl + state.thisJSONFile, function (data) {
 
@@ -593,17 +593,17 @@
         }
     }
 
-    function _generateDropdownMenu() {
-        d3.selectAll(".page-title").append("div")
-            .classed("dropdown", true)
-            .append("button")
-            .attr("onclick", "_selectFire()")
-            .classed("dropbtn", true)
-            .text("Select Active Fire")
-            .append("div")
-            .attr("id", "fireSelect")
-            .classed("dropdown-content", true);
-    }
+    // function _generateDropdownMenu() {
+    //     d3.selectAll(".page-title").append("div")
+    //         .classed("dropdown", true)
+    //         .append("button")
+    //         .attr("onclick", "_selectFire()")
+    //         .classed("dropbtn", true)
+    //         .text("Select Active Fire")
+    //         .append("div")
+    //         .attr("id", "fireSelect")
+    //         .classed("dropdown-content", true);
+    // }
 
     /* When the user clicks on the button,
     toggle between hiding and showing the dropdown content */
