@@ -175,7 +175,7 @@
     document.getElementById("page-time").innerHTML = d.toUTCString();
 
     function generateDropdownMenu() {
-        d3.select(".page-title").append("div")
+        d3.selectAll(".page-title").append("div")
             .classed("dropdown", true)
             .append("button")
             .attr("onclick", "selectFire()")
@@ -183,7 +183,7 @@
             .text("Select Active Fire")
             .append("div")
             .attr("id", "fireSelect")
-            .class("dropdown-content", true)
+            .class("dropdown-content", true);
     }
     generateDropdownMenu();
     /* When the user clicks on the button,
@@ -195,7 +195,6 @@
     // Close the dropdown menu if the user clicks outside of it
     window.onclick = function (event) {
         if (!event.target.matches('.dropbtn')) {
-
             var dropdowns = document.getElementsByClassName("dropdown-content");
             var i;
             for (i = 0; i < dropdowns.length; i++) {
