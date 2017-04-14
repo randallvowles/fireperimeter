@@ -1,4 +1,8 @@
 (function () {
+
+    //TO DO: move time to header, reformat metadata emitter, displayunits.get, make repository
+    // private, add index.html <html></html> files to all folders, reorganized directories
+
     "use strict";
 
     var APITOKEN = "c5213a1102b8422c80378944e1246d10"

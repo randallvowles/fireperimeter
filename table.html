@@ -91,7 +91,19 @@
                     </ul>
                 </li>
             </ul>
-
+            <form class="navbar-form navbar-right">
+                <a href="//mesowest.utah.edu">
+                    <button class="btn btn-default img__mw20-logo">
+                    <img src="{{"assets/img/mw-20th-trans.png" | prepend: site.baseurl }}" class="img__mw20-logo" />
+                    </button>
+                </a>
+            </form>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="//http:mesowest.utah.edu">Return to MesoWest</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a id="currentTime"></a></li>
+            </ul>
         </div>
         <!-- /.navbar-collapse -->
     </div>
@@ -178,6 +190,15 @@
     var d = new Date();
     document.getElementById("page-time").innerHTML = d.toUTCString();
 
+
+    function _runningClock(){
+        setInterval(updateTime, 1000);
+        function updateTime() {
+        var d = new Date();
+        document.getElementById("currentTime").innerHTML = d;
+        }
+    }
+
     function _exclusions(checkbox) {
         d3.selectAll("th").each(function () {
             d3.select(this.parentNode).classed("hasBang", true)
@@ -232,7 +253,7 @@
             //     "max": maxValueWD
             // }
         };
-        var newURL = base_url + "?select=" + JSON.stringify(filterInterface);
+        var newURL = base_url + "&select=" + JSON.stringify(filterInterface);
         // var newURL = "?select=" + JSON.stringify(filterInterface);
         window.location.href = newURL;
     }
