@@ -203,10 +203,11 @@
                 "shortname": "TFO",
                 "vid": 99
             }
-            _fireMetaDataEmitter();
+
             _networkTableEmitter(M, tableArgs);
             _highlightCells(filter);
             _highlightQC(M.response);
+            _fireMetaDataEmitter();
 
 
         });
