@@ -165,10 +165,10 @@
         setInterval(updateTime, 1000);
         function updateTime() {
         var d = new Date();
-        // document.getElementById(".currentTime").innerHTML = d;
-        d3.selectAll(".currentTime").each(function(q){
-            d3.select(this).append("p").text(d)
-        })
+        document.getElementById("currentTime").innerHTML = d;
+        // d3.selectAll(".currentTime").each(function(q){
+        //     d3.select(this).append("p").text(d)
+        // })
         }
     }
     _runningClock();
