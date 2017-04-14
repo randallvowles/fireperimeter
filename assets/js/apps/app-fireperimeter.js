@@ -118,104 +118,104 @@
         console.log(current_json);
         var a;
         var fire_keys = [];
-        for (a in current_json){
+        for (a in current_json) {
             fire_keys.push(a);
             console.log(a)
-            d3.selectAll(".selectFire").each(function(d){
+            d3.selectAll(".selectFire").each(function (d) {
                 d3.select(this)
-                .append("li")
-                .append("a")
-                .attr("href", "http://home.chpc.utah.edu/~u0540701/fireperimeter/table.html?fire="+a)
-                .text(a);
+                    .append("li")
+                    .append("a")
+                    .attr("href", "http://home.chpc.utah.edu/~u0540701/fireperimeter/table.html?fire=" + a)
+                    .text(a);
             })
         }
 
-        try{
-        var key;
-        for (key in current_json[fireID]["nearest_stations"]) {
-            stidStack.push(current_json[fireID]["nearest_stations"][key]["STID"]);
-            stidAndDist.push(current_json[fireID]["nearest_stations"][key]["DFP"]);
-        };
-        var stidList = stidStack.join(",");
-        apiArgs.stid = stidList;
-        M.fetch({
-            api_args: apiArgs
-        })
-        // var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
-        // console.log(filter)
-        M.printResponse()
+        try {
+            var key;
+            for (key in current_json[fireID]["nearest_stations"]) {
+                stidStack.push(current_json[fireID]["nearest_stations"][key]["STID"]);
+                stidAndDist.push(current_json[fireID]["nearest_stations"][key]["DFP"]);
+            };
+            var stidList = stidStack.join(",");
+            apiArgs.stid = stidList;
+            M.fetch({
+                api_args: apiArgs
+            })
+            // var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
+            // console.log(filter)
+            M.printResponse()
 
 
-        $.when(M.async()).done(function () {
-            //timestamp and map function
-            M.response.sensor.units[0].bfp = "Degrees"
-            M.response.sensor.units[0].dfp = "Statute miles"
-            M.response.sensor.units[0].date_time = "Minutes"
-            M.response.sensor.units[0].wind_direction = "code"
-            M.response.sensor.units[0].weather_condition = "code"
-            M.response.ui.toc["bfp"] = 4
-            M.response.ui.toc["dfp"] = 5
-            M.response.ui.toc["stid"] = 6
-            M.response.ui.toc["weather_condition"] = 7
-            M.response.ui.toc["time"] = 8
-            M.response.ui.sensors[4] = {
-                "apiname": "bfp",
-                "default": "true",
-                "group": 99,
-                "longname": "Bearing From Perimeter",
-                "pos": 99,
-                "shortname": "BFP",
-                "vid": 99
-            }
-            M.response.ui.sensors[5] = {
-                "apiname": "dfp",
-                "default": "true",
-                "group": 99,
-                "longname": "Distance From Perimeter",
-                "pos": 99,
-                "shortname": "DFP",
-                "vid": 99
-            }
-            M.response.ui.sensors[6] = {
-                "apiname": "stid",
-                "default": "true",
-                "group": 99,
-                "longname": "Station ID",
-                "pos": 99,
-                "shortname": "STID",
-                "vid": 99
-            }
-            M.response.ui.sensors[7] = {
-                "apiname": "weather_condition",
-                "default": "true",
-                "group": 99,
-                "longname": "Weather Condition",
-                "pos": 99,
-                "shortname": "WC",
-                "vid": 99
-            }
-            M.response.ui.sensors[8] = {
-                "apiname": "time",
-                "default": "true",
-                "group": 99,
-                "longname": "Time From Observation",
-                "pos": 99,
-                "shortname": "TFO",
-                "vid": 99
-            }
+            $.when(M.async()).done(function () {
+                //timestamp and map function
+                M.response.sensor.units[0].bfp = "Degrees"
+                M.response.sensor.units[0].dfp = "Statute miles"
+                M.response.sensor.units[0].date_time = "Minutes"
+                M.response.sensor.units[0].wind_direction = "code"
+                M.response.sensor.units[0].weather_condition = "code"
+                M.response.ui.toc["bfp"] = 4
+                M.response.ui.toc["dfp"] = 5
+                M.response.ui.toc["stid"] = 6
+                M.response.ui.toc["weather_condition"] = 7
+                M.response.ui.toc["time"] = 8
+                M.response.ui.sensors[4] = {
+                    "apiname": "bfp",
+                    "default": "true",
+                    "group": 99,
+                    "longname": "Bearing From Perimeter",
+                    "pos": 99,
+                    "shortname": "BFP",
+                    "vid": 99
+                }
+                M.response.ui.sensors[5] = {
+                    "apiname": "dfp",
+                    "default": "true",
+                    "group": 99,
+                    "longname": "Distance From Perimeter",
+                    "pos": 99,
+                    "shortname": "DFP",
+                    "vid": 99
+                }
+                M.response.ui.sensors[6] = {
+                    "apiname": "stid",
+                    "default": "true",
+                    "group": 99,
+                    "longname": "Station ID",
+                    "pos": 99,
+                    "shortname": "STID",
+                    "vid": 99
+                }
+                M.response.ui.sensors[7] = {
+                    "apiname": "weather_condition",
+                    "default": "true",
+                    "group": 99,
+                    "longname": "Weather Condition",
+                    "pos": 99,
+                    "shortname": "WC",
+                    "vid": 99
+                }
+                M.response.ui.sensors[8] = {
+                    "apiname": "time",
+                    "default": "true",
+                    "group": 99,
+                    "longname": "Time From Observation",
+                    "pos": 99,
+                    "shortname": "TFO",
+                    "vid": 99
+                }
 
-            _networkTableEmitter(M, tableArgs);
-            _highlightCells(filter);
-            _highlightQC(M.response);
-            _fireMetaDataEmitter();
+                _networkTableEmitter(M, tableArgs);
+                _highlightCells(filter);
+                _highlightQC(M.response);
+                _fireMetaDataEmitter(current_json);
 
 
-        });
-        } catch(err){
+            });
+        } catch (err) {
             d3.selectAll(".nettable-container")
-            .append("div")
-            .classed("row col-sm-12", true)
-            .append("p").text("Please select an Active Fire from the menu to generate the table.")
+                .append("div")
+                .classed("row col-sm-12", true)
+                .append("p").text("Please select an Active Fire from the menu to generate the table.")
         }
     })
     return
@@ -601,14 +601,14 @@
         }
     }
 
-    function _fireMetaDataEmitter(){
-        var _m = current_json[fireID]
-        d3.select(".fireMetadata").append("h3").text(_m["desc"]["Fire Name"]+ " , " + _m["desc"]["Unique Fire Identifier"])
+    function _fireMetaDataEmitter(object) {
+        var _m = object[fireID]
+        d3.select(".fireMetadata").append("h3").text(_m["desc"]["Fire Name"] + " , " + _m["desc"]["Unique Fire Identifier"])
         d3.select(".fireMetadata").append("p").text(_m["lat"] + " N, " + _m["lon"] + " S")
         d3.select(".fireMetadata").append("p").text("Started on: " + _m["desc"]["Perimeter Date"])
         d3.select(".fireMetadata").append("p").text("Acres: " + _m["desc"]["Acres"])
         d3.select(".fireMetadata").append("p").append("a")
-            .on("click", function(d){
+            .on("click", function (d) {
                 var url = "https://rmgsc.cr.usgs.gov/outgoing/GeoMAC/"
                 hrefHandler(url, true)
             })
@@ -618,8 +618,7 @@
     function hrefHandler(url, newWindow) {
         if ((typeof newWindow !== "undefined" && newWindow) || true) {
             window.open(url, '_blank');
-        }
-        else {
+        } else {
             window.location.href = url;
         }
     }
