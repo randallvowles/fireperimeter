@@ -1,7 +1,7 @@
 (function () {
 
-    //TO DO: move time to header, reformat metadata emitter, displayunits.get, make repository
-    // private, add index.html <html></html> files to all folders, reorganized directories
+    //TO DO:reformat metadata emitter,
+    //reorganized directories
 
     "use strict";
 
@@ -203,6 +203,7 @@
                 "shortname": "TFO",
                 "vid": 99
             }
+            _fireMetaDataEmitter();
             _networkTableEmitter(M, tableArgs);
             _highlightCells(filter);
             _highlightQC(M.response);
@@ -599,23 +600,27 @@
         }
     }
 
-    // function _generateDropdownMenu() {
-    //     d3.selectAll(".page-title").append("div")
-    //         .classed("dropdown", true)
-    //         .append("button")
-    //         .attr("onclick", "_selectFire()")
-    //         .classed("dropbtn", true)
-    //         .text("Select Active Fire")
-    //         .append("div")
-    //         .attr("id", "fireSelect")
-    //         .classed("dropdown-content", true);
-    // }
+    function _fireMetaDataEmitter(){
+        var _m = current_json[fireID]
+        d3.select(".fireMetadata").append("h3").text(_m["desc"]["Fire Name"]+ " , " + _m["desc"]["Unique Fire Identifier"])
+        d3.select(".fireMetadata").append("p").text(_m["lat"] + " N, " + _m["lon"] + " S")
+        d3.select(".fireMetadata").append("p").text("Started on: " + _m["desc"]["Perimeter Date"])
+        d3.select(".fireMetadata").append("p").text("Acres: " + _m["desc"]["Acres"])
+        d3.select(".fireMetadata").append("p").append("a")
+            .on("click", function(d){
+                var url = "https://rmgsc.cr.usgs.gov/outgoing/GeoMAC/"
+                hrefHandler(url, true)
+            })
+            .text("Data accessed from USGS GeoMACC")
+    }
 
-    /* When the user clicks on the button,
-    toggle between hiding and showing the dropdown content */
-    // function _selectFire() {
-    //     document.getElementById("fireSelect").classList.toggle("show");
-    // }
-
+    function hrefHandler(url, newWindow) {
+        if ((typeof newWindow !== "undefined" && newWindow) || true) {
+            window.open(url, '_blank');
+        }
+        else {
+            window.location.href = url;
+        }
+    }
 
 })();
