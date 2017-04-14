@@ -165,16 +165,19 @@
         setInterval(updateTime, 1000);
         function updateTime() {
         var d = new Date();
-        document.getElementById(".currentTime").innerHTML = d;
+        // document.getElementById(".currentTime").innerHTML = d;
+        d3.selectAll(".currentTime").each(function(q){
+            d3.select(this).append("p").text(d)
+        })
         }
     }
     _runningClock();
 
     function _exclusions(checkbox) {
-        d3.selectAll("th").each(function () {
+        d3.selectAll("th").each(function (d) {
             d3.select(this.parentNode).classed("hasBang", true)
         });
-        d3.selectAll(".tabtable-units").each(function () {
+        d3.selectAll(".tabtable-units").each(function (d) {
             d3.select(this.parentNode).classed("hasBang", true)
         });
         d3.selectAll("tr").selectAll(".bang").each(function (d) {
