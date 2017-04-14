@@ -207,7 +207,7 @@
                 _networkTableEmitter(M, tableArgs);
                 _highlightCells(filter);
                 _highlightQC(M.response);
-                _fireMetaDataEmitter(current_json);
+                _fireMetaDataEmitter(current_json[fireID]);
 
 
             });
@@ -602,7 +602,7 @@
     }
 
     function _fireMetaDataEmitter(object) {
-        var _m = object[fireID]
+        var _m = object
         d3.select(".fireMetadata").append("h3").text(_m["desc"]["Fire Name"] + " , " + _m["desc"]["Unique Fire Identifier"])
         d3.select(".fireMetadata").append("p").text(_m["lat"] + " N, " + _m["lon"] + " S")
         d3.select(".fireMetadata").append("p").text("Started on: " + _m["desc"]["Perimeter Date"])
