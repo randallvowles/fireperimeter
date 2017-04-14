@@ -94,7 +94,7 @@
             <form class="navbar-form navbar-right">
                 <a href="//mesowest.utah.edu">
                     <button class="btn btn-default img__mw20-logo">
-                    <img src="../assets/img/mw-20th-trans.png" | prepend: site.baseurl }} class="img__mw20-logo" />
+                    <!--<img src="../assets/img/mw-20th-trans.png" | prepend: site.baseurl }} class="img__mw20-logo" />-->
                     </button>
                 </a>
             </form>
@@ -102,7 +102,7 @@
                 <li><a href="//http:mesowest.utah.edu">Return to MesoWest</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li><a id="currentTime"></a></li>
+                <li><p id="currentTime"></p></li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -160,9 +160,6 @@
             </div>
 </body>
 <script type="text/javascript">
-    var d = new Date();
-    document.getElementById("page-time").innerHTML = d.toUTCString();
-
 
     function _runningClock(){
         setInterval(updateTime, 1000);
@@ -171,6 +168,7 @@
         document.getElementById(".currentTime").innerHTML = d;
         }
     }
+    _runningClock();
 
     function _exclusions(checkbox) {
         d3.selectAll("th").each(function () {
