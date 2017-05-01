@@ -40,7 +40,7 @@
 
 
     var state = {
-        baseUrl: 'http://home.chpc.utah.edu/~u0540701/storage/fire_data/',
+        baseUrl: '/uufs/chpc.utah.edu/common/home/u0540701/public_html/storage/fire_data',
         // thisJSONFile: "current__metadatastash.json"
         thisJSONFile: "current_fire_data.json"
     }
@@ -272,9 +272,9 @@
             rankedSensors.map(function (d) {
                 // Best to use terinary logic here, but for simplicity...
                 if (d === "distance_from_perimeter") {
-                    tmp[d] = [stidAndDist[i][0]];
+                    tmp[d] = [stidAndDist[i][d]];
                 } else if (d === "bearing_from_perimeter") {
-                    tmp[d] = [stidAndDist[i][1]];
+                    tmp[d] = [stidAndDist[i][d]];
                 } else if (d === "weather_condition") {
                     try {
                         tmp[d] = [_s[i].OBSERVATIONS[d + "_set_1d"][last]] // add to include cardinal direction
