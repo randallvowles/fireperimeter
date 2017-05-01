@@ -40,7 +40,7 @@
 
 
     var state = {
-        baseUrl: '/uufs/chpc.utah.edu/common/home/u0540701/public_html/storage/fire_data',
+        baseUrl: 'http://home.chpc.utah.edu/~u0540701/storage/fire_data/',
         // thisJSONFile: "current__metadatastash.json"
         thisJSONFile: "current_fire_data.json"
     }
