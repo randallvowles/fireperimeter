@@ -53,6 +53,9 @@
             if (request.readyState === 4 && request.status === 200) {
                 json_total = JSON.parse(request.responseText)
                 callback(JSON.parse(request.responseText))
+            } else {
+                console.log(url)
+                console.log(request.responseText)
             }
         }
         request.send(null);
@@ -94,19 +97,19 @@
     var fireID = windowURL.fire;
     console.log(fireID);
 
-    // HTTPFetch(state.baseUrl + state.thisJSONFile, printFetchResponse);
-    // var current_json = json_total;
-    // console.log(current_json);
-    // var key;
-    // for (key in current_json[fireID][nearest_stations]) {
-    //     stidStack.push(current_json[fireID][nearest_stations][key]["STID"]);
-    //     stidAndDist.push(current_json[fireID][nearest_stations][key]["DFP"]);
-    // };
-    // var stidList = stidStack.join(",");
-    // apiArgs.stid = stidList;
-    // M.fetch({
-    //     api_args: apiArgs
-    //     })
+    HTTPFetch(state.baseUrl + state.thisJSONFile, printFetchResponse);
+    var current_json = json_total;
+    console.log(current_json);
+    var key;
+    for (key in current_json[fireID][nearest_stations]) {
+        stidStack.push(current_json[fireID][nearest_stations][key]["STID"]);
+        stidAndDist.push(current_json[fireID][nearest_stations][key]["distance_from_perimeter"]);
+    };
+    var stidList = stidStack.join(",");
+    apiArgs.stid = stidList;
+    M.fetch({
+        api_args: apiArgs
+        })
     var filter = M.windowArgs()[""] !== "undefined" && typeof M.windowArgs().select !== "undefined" ? JSON.parse(M.windowArgs().select) : {};
     console.log(filter)
     // M.printResponse()
@@ -134,7 +137,7 @@
             var key;
             for (key in current_json[fireID]["nearest_stations"]) {
                 stidStack.push(current_json[fireID]["nearest_stations"][key]["STID"]);
-                stidAndDist.push(current_json[fireID]["nearest_stations"][key]["DFP"]);
+                stidAndDist.push(current_json[fireID]["nearest_stations"][key]["distance_from_perimeter"]);
             };
             var stidList = stidStack.join(",");
             apiArgs.stid = stidList;
@@ -148,18 +151,18 @@
 
             $.when(M.async()).done(function () {
                 //timestamp and map function
-                M.response.sensor.units[0].bfp = "Degrees"
-                M.response.sensor.units[0].dfp = "Statute miles"
+                M.response.sensor.units[0].bearing_from_perimeter = "Degrees"
+                M.response.sensor.units[0].distance_from_perimeter = "Statute miles"
                 M.response.sensor.units[0].date_time = "Minutes"
                 M.response.sensor.units[0].wind_direction = "code"
                 M.response.sensor.units[0].weather_condition = "code"
-                M.response.ui.toc["bfp"] = 4
-                M.response.ui.toc["dfp"] = 5
+                M.response.ui.toc["bearing_from_perimeter"] = 4
+                M.response.ui.toc["distance_from_perimeter"] = 5
                 M.response.ui.toc["stid"] = 6
                 M.response.ui.toc["weather_condition"] = 7
                 M.response.ui.toc["time"] = 8
                 M.response.ui.sensors[4] = {
-                    "apiname": "bfp",
+                    "apiname": "bearing_from_perimeter",
                     "default": "true",
                     "group": 99,
                     "longname": "Bearing From Perimeter",
@@ -168,7 +171,7 @@
                     "vid": 99
                 }
                 M.response.ui.sensors[5] = {
-                    "apiname": "dfp",
+                    "apiname": "distance_from_perimeter",
                     "default": "true",
                     "group": 99,
                     "longname": "Distance From Perimeter",
@@ -238,8 +241,8 @@
         // we generate the table correctly.  We also want an array to put our sorted keys
         // back in to.  Once the sensors are ranked, we will create a sorted output that
         // will be ready to generate a table from.
-        rankedSensors.splice(0, 0, "dfp")
-        rankedSensors.splice(1, 0, "bfp")
+        rankedSensors.splice(0, 0, "distance_from_perimeter")
+        rankedSensors.splice(1, 0, "bearing_from_perimeter")
         rankedSensors.splice(2, 0, "date_time")
 
         // Should put all these styles in a class
@@ -268,9 +271,9 @@
             tmp.stid = _s[i].STID;
             rankedSensors.map(function (d) {
                 // Best to use terinary logic here, but for simplicity...
-                if (d === "dfp") {
+                if (d === "distance_from_perimeter") {
                     tmp[d] = [stidAndDist[i][0]];
-                } else if (d === "bfp") {
+                } else if (d === "bearing_from_perimeter") {
                     tmp[d] = [stidAndDist[i][1]];
                 } else if (d === "weather_condition") {
                     try {
@@ -402,7 +405,7 @@
                 }
             })
             .classed("fa-chevron-circle-down", function (d) {
-                return d === "dfp" ? true : false;
+                return d === "distance_from_perimeter" ? true : false;
             })
 
         // Add the units to the table. We add this as a `TD` in the `THEAD` node.  If you change
@@ -478,7 +481,8 @@
         var hyperlink = d3.selectAll(".stid")
             .on("click", function () {
                 // window.open(baseURL + d3.select(this).text());
-                window.open(new_baseURL + d3.select(this).text());
+                var stid_url = new_baseURL + d3.select(this).text();
+                hrefHandler(stid_url, true)
             });
         var timeConversion = d3.selectAll(".date_time")
             .text(function (d) {
@@ -603,16 +607,16 @@
 
     function _fireMetaDataEmitter(object) {
         var _m = object
-        d3.select(".fireMetadata").append("h3").text(_m["desc"]["Fire Name"] + " , " + _m["desc"]["Unique Fire Identifier"])
-        d3.select(".fireMetadata").append("p").text(_m["lat"] + " N, " + _m["lon"] + " S")
-        d3.select(".fireMetadata").append("p").text("Started on: " + _m["desc"]["Perimeter Date"])
-        d3.select(".fireMetadata").append("p").text("Acres: " + _m["desc"]["Acres"])
+        d3.select(".fireMetadata").append("h3").text(_m["desc"]["Fire Name"] + " , " + _m["desc"]["Unique Fire Identifier"]);
+        d3.select(".fireMetadata").append("p").text(_m["lat"] + " N, " + _m["lon"] + " S");
+        d3.select(".fireMetadata").append("p").text("Started on: " + _m["desc"]["Perimeter Date"]);
+        d3.select(".fireMetadata").append("p").text("Acres: " + _m["desc"]["Acres"]);
         d3.select(".fireMetadata").append("p").append("a")
             .on("click", function (d) {
                 var url = "https://rmgsc.cr.usgs.gov/outgoing/GeoMAC/"
                 hrefHandler(url, true)
             })
-            .text("Data accessed from USGS GeoMACC")
+            .text("Data accessed from USGS GeoMACC");
     }
 
     function hrefHandler(url, newWindow) {
