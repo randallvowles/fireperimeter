@@ -165,9 +165,9 @@ var Mesonet = (function() {
      */
     Mesonet.prototype.epochDate = function(_date) {
 
-        /**    
-         * Logic    
-         * if UTC    
+        /**
+         * Logic
+         * if UTC
          *     if _date is Date object
          *     if _date is a string
          *     if _date is a Unix time
@@ -197,7 +197,7 @@ var Mesonet = (function() {
     Mesonet.prototype.apiDateToEpoch = function(apiDate, time) {
         var a = "";
 
-        // Input checking. If fail then bail out.    
+        // Input checking. If fail then bail out.
         if (typeof time === "undefined") {
             time = false;
         }
@@ -255,7 +255,7 @@ var Mesonet = (function() {
         var _date = _p === -1 ? null : Number(_p[0]) - _h[0] * (_h[1] + _h[2]);
         return _date;
     };
-    /** 
+    /**
      * Does the array contain?
      * @param {any} - What to look for
      * @param {array} - Array to look inside
@@ -283,12 +283,12 @@ var Mesonet = (function() {
         args = typeof args === "undefined" ? {} : args;
         args.diagnostic = typeof args.diagnostic === "undefined" ? false : args.diagnostic;
 
-        // Determine web service   
+        // Determine web service
         if (typeof this.config.fetch.service === "undefined" && typeof args.service === "undefined") {
             console.log("#uil4z - No Mesonet web service set.");
             return false;
         } else {
-            // Give priority to `args.service`, then default to 
+            // Give priority to `args.service`, then default to
             // the global option.  This does NOT modify the global settings.
             args.service = typeof args.service === "undefined" ? this.config.fetch.service : args.service;
         }
@@ -314,7 +314,7 @@ var Mesonet = (function() {
             console.log("#6sgcf - No Mesonet API token set.");
             return false;
         } else {
-            // Give priority to the passed token, then default to 
+            // Give priority to the passed token, then default to
             // the setApiToken location.This does NOT set the global token.
             args.api_args.token = typeof args.api_args.token === "undefined" ?
                 this.config.fetch.api_token : args.api_args.token;
@@ -327,7 +327,7 @@ var Mesonet = (function() {
     };
 
     /**
-     * API async broker 
+     * API async broker
      * @returns {promise}
      */
     Mesonet.prototype._apiBrokerAsyncManager = function(args) {
@@ -396,7 +396,7 @@ var Mesonet = (function() {
                 web_service: "QcTypes",
                 base_url: ws.base_url,
                 web_service_url: "qctypes?callback=?",
-                api_args: args.api_args
+                api_args: {token: args.api_args.token}
             });
         } else {
             p2 = __dummyLoad();
@@ -408,7 +408,7 @@ var Mesonet = (function() {
                 web_service: "Variables",
                 base_url: ws.base_url,
                 web_service_url: "variables?callback=?",
-                api_args: args.api_args
+                api_args: {token: args.api_args.token}
             });
         } else {
             p3 = __dummyLoad();
@@ -420,13 +420,13 @@ var Mesonet = (function() {
                 web_service: "Networks",
                 base_url: ws.base_url,
                 web_service_url: "networks?callback=?",
-                api_args: args.api_args
+                api_args: {token: args.api_args.token}
             });
             p5 = __apiBrokerWorker({
                 web_service: "NetworkTypes",
                 base_url: ws.base_url,
                 web_service_url: "networktypes?callback=?",
-                api_args: args.api_args
+                api_args: {token: args.api_args.token}
             });
         } else {
             p4 = __dummyLoad();
@@ -509,7 +509,7 @@ var Mesonet = (function() {
             return deferred.promise();
 
 
-            /** 
+            /**
              * Process the response and deliver back to the namespace
              */
             function __haveResponse(args, obj) {
@@ -531,6 +531,7 @@ var Mesonet = (function() {
                 if (obj.SUMMARY.RESPONSE_CODE !== 1) {
                     console.log("#oggi1 - Error code issued from Mesonet API.");
                     console.log(obj.SUMMARY.RESPONSE_MESSAGE);
+                    // console.log(args)
                     _r.summary = obj.SUMMARY;
                     return false;
                 }
@@ -624,9 +625,9 @@ var Mesonet = (function() {
                         // Reverse the stack order so they display correctly
                         //
                         // Sometimes we have multiples of sensors in the same stack.
-                        // i.e. `air_temp_set_1`, `air_temp_set_2` etc. We want to 
+                        // i.e. `air_temp_set_1`, `air_temp_set_2` etc. We want to
                         // sort them by their order.
-                        // @TODO: Depending on the service call, the `_set_` 
+                        // @TODO: Depending on the service call, the `_set_`
                         //        signature might cause some trouble.
 
                         // *** We really should depreciate this. Need to know what the downstream
@@ -670,9 +671,11 @@ var Mesonet = (function() {
                                     _ii = 0;
                                     _ll = _list.length;
                                     while (_ii < _ll) {
-                                        _r.ui.build._o.push(_list[_ii]);
-                                        _r.ui.build._d.push(!_r.ui.sensors[_i].default || _ii > 0 ? false : true);
-                                        _r.ui.build._n.push(_r.ui.sensors[_i].apiname);
+                                        if (typeof _r.station[i].OBSERVATIONS[_list[_ii]] !== "undefined") {
+                                            _r.ui.build._o.push(_list[_ii]);
+                                            _r.ui.build._d.push(!_r.ui.sensors[_i].default || _ii > 0 ? false : true);
+                                            _r.ui.build._n.push(_r.ui.sensors[_i].apiname);
+                                        }    
                                         _ii++;
                                     }
                                 }
@@ -697,9 +700,9 @@ var Mesonet = (function() {
                         // Reverse the stack order so they display correctly
                         //
                         // Sometimes we have multiples of sensors in the same stack.
-                        // i.e. `air_temp_set_1`, `air_temp_set_2` etc. We want to 
+                        // i.e. `air_temp_set_1`, `air_temp_set_2` etc. We want to
                         // sort them by their order.
-                        // @TODO: Depending on the service call, the `_set_` 
+                        // @TODO: Depending on the service call, the `_set_`
                         //        signature might cause some trouble.
 
                         _r.sensor.stack[i] = [];

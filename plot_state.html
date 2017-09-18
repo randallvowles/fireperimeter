@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Stations by State</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="map-marker" type="image/icon" href="../map-marker.svg" />
+    <!--<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />-->
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js" integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
+        crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/2.6.1/svg.js"></script>
+
+    <style>
+        #map {
+            width: 600px;
+            height: 400px;
+        }
+    </style>
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        html,
+        body,
+        #map {
+            height: 100vh;
+            width: 100vw;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id='map'></div>
+
+    <script>
+        var lightMapURL =
+            'https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoicmFuZGFsbHZvd2xlcyIsImEiOiJjaXJwN25tbHIwZW41ZmZtNmh6Yjhpc3plIn0.zBFrUBZ2RIFMeTREAuJhHA';
+        var darkMapURL =
+            'https://api.mapbox.com/styles/v1/mapbox/dark-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoicmFuZGFsbHZvd2xlcyIsImEiOiJjaXJwN25tbHIwZW41ZmZtNmh6Yjhpc3plIn0.zBFrUBZ2RIFMeTREAuJhHA';
+        var streetMapURL =
+            'https://api.mapbox.com/styles/v1/mapbox/streets-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoicmFuZGFsbHZvd2xlcyIsImEiOiJjaXJwN25tbHIwZW41ZmZtNmh6Yjhpc3plIn0.zBFrUBZ2RIFMeTREAuJhHA';
+        var satStreetMapURL =
+            'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoicmFuZGFsbHZvd2xlcyIsImEiOiJjaXJwN25tbHIwZW41ZmZtNmh6Yjhpc3plIn0.zBFrUBZ2RIFMeTREAuJhHA';
+        var lightMap = L.tileLayer(lightMapURL, {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            id: 'mapbox.streets'
+        });
+        var darkMap = L.tileLayer(darkMapURL, {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            id: 'mapbox.streets'
+        });
+        var streetMap = L.tileLayer(streetMapURL, {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            id: 'mapbox.streets'
+        });
+        var satStreetMap = L.tileLayer(satStreetMapURL, {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            id: 'mapbox.streets'
+        });
+
+
+
+        var baseMaps = {
+            "Light": lightMap,
+            "Dark": darkMap,
+            "Street": streetMap,
+            "Satellite Street": satStreetMap
+        }
+        var map = L.map('map', {
+            center: [39.8333333, -98.585522],
+            zoom: 4,
+            layers: lightMap
+        })
+        L.control.layers(baseMaps).addTo(map);
+        var mapMarker = L.icon({
+            iconUrl: "./map-marker.svg",
+            iconSize: [10, 30]
+        })
+
+        // var draw = SVG('drawing').size(20, 50)
+        // var polyline = draw.polyline('50,0 60,40 100,50 60,60 50,100 40,60 0,50 40,40')
+        // polyline.fill('#CC1000')
+        // polyline.stroke({color: '#CC1000', width: 4, linecap: 'round', linejoin: 'round'})
+        // var newMapMarker = L.icon({iconUrl: polyline, iconSize: [10, 30]})
+
+        var data = '<?xml version="1.0" encoding="iso-8859-1"?>' +
+            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" ' +
+            'id="Capa_1" x="0px" y="0px" width="512px" height="512px" viewBox="0 0 485.213 485.212" ' +
+            'style="enable-background:new 0 0 485.213 485.212;" xml:space="preserve">' +
+            '<g><path d="M242.606,0C142.124,0,60.651,81.473,60.651,181.955c0,40.928,13.504,78.659,36.31,109.075l145.646,194.183L388.252,291.03' +
+            'c22.808-30.416,36.31-68.146,36.31-109.075C424.562,81.473,343.089,0,242.606,0z M242.606,303.257' +
+            'c-66.989,0-121.302-54.311-121.302-121.302c0-66.989,54.313-121.304,121.302-121.304c66.991,0,121.302,54.315,121.302,121.304' +
+            'C363.908,248.947,309.598,303.257,242.606,303.257z" fill="#cc1000"/></svg>'
+        // '</g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g><g></g></svg>"';
+        // var data = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">' +
+        //    '<foreignObject width="100%" height="100%">' +
+        //    '<div xmlns="http://www.w3.org/1999/xhtml" style="font-size:40px">' +
+        //      '<em>I</em> like ' + 
+        //      '<span style="color:white; text-shadow:0 0 2px blue;">' +
+        //      'cheese</span>' +
+        //    '</div>' +
+        //    '</foreignObject>' +
+        //    '</svg>';
+        // L.marker([39.8333333,-98.585522], {icon: mapMarker}).addTo(map)
+        //     .bindPopup("I'm the center of the US!");
+
+        var DOMURL = window.URL || window.webkitURL || window;
+        var img = new Image();
+        var svg = new Blob([data], {
+            type: 'image/svg+xml'
+        });
+        var url = DOMURL.createObjectURL(svg);
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0);
+            DOMURL.revokeObjectURL(url);
+        };
+        console.log(url);
+        img.src = url;
+        var svgMarker = L.icon({
+            iconUrl: url,
+            iconSize: [10, 30]
+        })
+
+
+        var apiURL = "http://api.mesowest.net/v2/stations/metadata"
+        var windowARGS = getWindowArgs();
+        windowARGS.token = "demotoken";
+        // windowARGS.status = "active";
+        jsonFetch(apiURL, windowARGS, function (d) {
+            console.log(d);
+            d.STATION.map(function (q) {
+                L.marker([q.LATITUDE, q.LONGITUDE], {
+                        // icon: mapMarker
+                        icon: svgMarker
+                    }).addTo(map)
+                    .bindPopup("STID: " + q.STID + ", " +
+                        "LAT: " + q.LATITUDE + ", " +
+                        "LON: " + q.LONGITUDE + ", " +
+                        "NAME: " + q.NAME);
+            })
+        })
+        var popup = L.popup();
+
+
+        function onMapClick(e) {
+            popup
+                .setLatLng(e.latlng)
+                .setContent("You clicked the map at " + e.latlng.toString())
+                .openOn(map);
+        }
+        map.on('click', onMapClick);
+
+
+        function jsonFetch(url, args, callback) {
+            var request = new XMLHttpRequest();
+            request.open("GET", serialize(url, args))
+            request.onreadystatechange = function () {
+                if (request.readyState === 4 && request.status === 200) {
+                    callback(JSON.parse(request.responseText))
+                }
+            }
+            request.send(null);
+
+
+            function serialize(url, obj) {
+                var str = ['?'];
+                for (var p in obj) {
+                    if (obj.hasOwnProperty(p)) {
+                        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                    }
+                }
+                return url + str.join("&");
+            }
+        }
+
+
+        function getWindowArgs() {
+            var a = {};
+            var b = window.location.search.substring(1).split("&");
+            var pair;
+            var c;
+            var l = b.length;
+            if (window.location.search.substring(1).split("=") === 1) {
+                return "undefined";
+            } else {
+                for (var i = 0; i < l; i++) {
+                    // Grab the values and add a key
+                    pair = b[i].split("=");
+                    if (typeof a[pair[0]] === "undefined") {
+                        a[pair[0]] = decodeURIComponent(pair[1]);
+                        // if (pair[1].split(",").length > 1) {
+                        //     a[pair[0]] = pair[1].split(",");
+                        // }
+                    }
+                }
+                return a;
+            }
+        }
+    </script>
+
+
+
+</body>
+
+</html>
